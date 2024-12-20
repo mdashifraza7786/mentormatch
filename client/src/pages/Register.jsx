@@ -59,6 +59,17 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true); // Start the loader
+    if(!photo || !name || !email || !mobile || !password || !skills) {
+      setLoading(false); // Stop the loader
+      toast.error('All fields are required, including photo', {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        transition: Bounce,
+      });
+      return;
+    }
 
     const formData = new FormData();
     formData.append('type', role);
@@ -75,7 +86,7 @@ const Register = () => {
     }
 
     try {
-      const response = await fetch('/api/register', {
+      const response = await fetch('http://localhost:5001/register', {
         method: 'POST',
         body: formData,
       });
