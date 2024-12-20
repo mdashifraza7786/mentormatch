@@ -1,7 +1,8 @@
-const mongoose = require('mongoose');
-require("dotenv").config()
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+dotenv.config();
 
-const URI = "mongodb+srv://professionalid2003:123@cluster0.2sfjllp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+const URI = "mongodb+srv://professionalid2003:mentormatch@cluster0.kmhre.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
 const connectDB = async () => {
     try {

@@ -35,29 +35,27 @@ const UserDiscovery = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gray-100 font-raleway">
+    <div className="min-h-screen bg-gray-50 font-raleway">
       {/* Header */}
-      <header className="bg-blue-600 text-white py-6">
-        <div className="container mx-auto px-4">
-          <h1 className="text-3xl font-bold text-center">User Discovery</h1>
-          <p className="text-center mt-2">
-            Find mentors or mentees that match your skills and interests.
-          </p>
+      <header className="bg-indigo-600 text-white py-6">
+        <div className="container mx-auto px-4 text-center">
+          <h1 className="text-4xl font-semibold">User Discovery</h1>
+          <p className="text-lg mt-2">Find mentors or mentees that match your skills and interests.</p>
         </div>
       </header>
 
       {/* Search and Filter Section */}
-      <main className="container mx-auto px-4 py-10">
-        <div className="flex flex-col lg:flex-row items-center justify-between mb-8">
+      <main className="container mx-auto px-4 py-12">
+        <div className="flex flex-col lg:flex-row items-center justify-between mb-8 space-y-4 lg:space-y-0">
           <input
             type="text"
-            className="w-full lg:w-1/3 border border-gray-300 rounded-md p-3 mb-4 lg:mb-0"
+            className="w-full lg:w-2/5 border border-gray-300 rounded-lg p-4 text-lg"
             placeholder="Search by name or skills..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           <select
-            className="w-full lg:w-1/5 border border-gray-300 rounded-md p-3"
+            className="w-full lg:w-1/4 border border-gray-300 rounded-lg p-4 text-lg"
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
           >
@@ -68,27 +66,27 @@ const UserDiscovery = () => {
         </div>
 
         {/* User List */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredUsers.map((user) => (
             <div
               key={user.id}
-              className="bg-white shadow-md rounded-lg p-6 border border-gray-200"
+              className="bg-white shadow-lg rounded-lg p-6 border border-gray-200 transition transform hover:scale-105"
             >
-              <h2 className="text-xl font-bold mb-2">{user.name}</h2>
+              <h2 className="text-2xl font-semibold text-indigo-600 mb-2">{user.name}</h2>
               <p className="text-sm text-gray-500 mb-2">{user.role}</p>
-              <p className="text-sm text-gray-700 mb-4">{user.bio}</p>
+              <p className="text-base text-gray-700 mb-4">{user.bio}</p>
               <div className="flex flex-wrap gap-2 mb-4">
                 {user.skills.map((skill, index) => (
                   <span
                     key={index}
-                    className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm"
+                    className="bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full text-sm font-medium"
                   >
                     {skill}
                   </span>
                 ))}
               </div>
               <button
-                className="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300"
+                className="bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-indigo-700 transition duration-300"
               >
                 Connect
               </button>

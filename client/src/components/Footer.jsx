@@ -3,7 +3,7 @@ import { SiHotelsdotcom } from "react-icons/si";
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-100 px-8 py-10 font-poppins">
+    <footer className="bg-gray-100 px-8 py-10 shadow-lg font-poppins">
       {/* Brand Section */}
       <div className="flex items-center text-2xl font-semibold mb-8">
         <span className="flex items-center gap-2 text-gray-800">

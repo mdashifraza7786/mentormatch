@@ -2,7 +2,7 @@ import React from 'react';
 
 const Matchmake = () => {
   return (
-    <div className="min-h-screen bg-gray-100 font-raleway">
+    <div className="min-h-screen pb-[5vh] bg-gray-100 font-raleway">
       {/* Page Header */}
       <header className="bg-blue-600 text-white py-6">
         <div className="container mx-auto px-4">
@@ -12,7 +12,7 @@ const Matchmake = () => {
       </header>
 
       {/* Matchmaking Form */}
-      <main className="container mx-auto px-4 py-10">
+      <main className="container mx-auto px-[10vw] py-[5vh]">
         <div className="bg-white shadow-md rounded-lg p-8">
           <h2 className="text-2xl font-bold text-center mb-6">Start Matching</h2>
           <form>

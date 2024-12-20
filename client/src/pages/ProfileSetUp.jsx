@@ -13,41 +13,39 @@ const ProfileSetUp = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 font-raleway">
+    <div className="min-h-screen bg-gray-50 font-raleway">
       {/* Page Header */}
-      <header className="bg-blue-600 text-white py-6">
-        <div className="container mx-auto px-4">
-          <h1 className="text-3xl font-bold text-center">Set Up Your Profile</h1>
-          <p className="text-center mt-2">
-            Help others understand your expertise and interests.
-          </p>
+      <header className="bg-blue-600 text-white py-8">
+        <div className="container mx-auto text-center px-4">
+          <h1 className="text-4xl font-bold">Set Up Your Profile</h1>
+          <p className="text-lg mt-2">Help others understand your expertise and interests.</p>
         </div>
       </header>
 
       {/* Profile Setup Form */}
-      <main className="container mx-auto px-4 py-10">
-        <div className="bg-white shadow-md rounded-lg p-8">
-          <h2 className="text-2xl font-bold text-center mb-6">Complete Your Profile</h2>
+      <main className="container mx-auto px-6 py-12">
+        <div className="bg-white shadow-lg rounded-lg p-8 md:p-12">
+          <h2 className="text-3xl font-semibold text-center mb-8">Complete Your Profile</h2>
           <form>
             {/* Profile Picture */}
-            <div className="mb-6 text-center">
-              <label className="block text-lg font-medium mb-2">Profile Picture:</label>
+            <div className="mb-8 text-center">
+              <label className="block text-lg font-medium mb-2">Profile Picture</label>
               <div className="flex flex-col items-center">
                 {profileImage ? (
                   <img
                     src={profileImage}
                     alt="Profile Preview"
-                    className="w-24 h-24 rounded-full object-cover mb-4"
+                    className="w-32 h-32 rounded-full object-cover mb-4"
                   />
                 ) : (
-                  <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 mb-4">
+                  <div className="w-32 h-32 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 mb-4">
                     No Image
                   </div>
                 )}
                 <input
                   type="file"
                   accept="image/*"
-                  className="block text-sm text-gray-600"
+                  className="block text-sm text-gray-600 file:py-2 file:px-4 file:rounded-md file:bg-blue-600 file:text-white"
                   onChange={handleImageUpload}
                 />
               </div>
@@ -55,7 +53,7 @@ const ProfileSetUp = () => {
 
             {/* Name */}
             <div className="mb-6">
-              <label className="block text-lg font-medium mb-2">Full Name:</label>
+              <label className="block text-lg font-medium mb-2">Full Name</label>
               <input
                 type="text"
                 className="w-full border border-gray-300 rounded-md p-3"
@@ -65,7 +63,7 @@ const ProfileSetUp = () => {
 
             {/* Bio */}
             <div className="mb-6">
-              <label className="block text-lg font-medium mb-2">Bio:</label>
+              <label className="block text-lg font-medium mb-2">Bio</label>
               <textarea
                 className="w-full border border-gray-300 rounded-md p-3"
                 rows="4"
@@ -75,7 +73,7 @@ const ProfileSetUp = () => {
 
             {/* Skills */}
             <div className="mb-6">
-              <label className="block text-lg font-medium mb-2">Skills:</label>
+              <label className="block text-lg font-medium mb-2">Skills</label>
               <textarea
                 className="w-full border border-gray-300 rounded-md p-3"
                 rows="3"
@@ -85,7 +83,7 @@ const ProfileSetUp = () => {
 
             {/* Availability */}
             <div className="mb-6">
-              <label className="block text-lg font-medium mb-2">Availability:</label>
+              <label className="block text-lg font-medium mb-2">Availability</label>
               <input
                 type="text"
                 className="w-full border border-gray-300 rounded-md p-3"
@@ -97,7 +95,7 @@ const ProfileSetUp = () => {
             <div className="text-center">
               <button
                 type="submit"
-                className="bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-300"
+                className="bg-blue-600 text-white font-semibold py-3 px-8 rounded-lg hover:bg-blue-700 transition duration-300"
               >
                 Save Profile
               </button>

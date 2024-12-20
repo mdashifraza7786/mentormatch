@@ -5,7 +5,6 @@ import './App.css';
 // Import Components
 import Footer from './components/Footer';
 import Navbar from './components/Navbar';
-import Notification from './components/Notification';
 
 // Import Pages
 import Home from './pages/Home';
@@ -14,25 +13,28 @@ import Matchmake from './pages/Matchmake';
 import ProfileSetUp from './pages/ProfileSetUp';
 import Register from './pages/Register';
 import UserDiscovery from './pages/UserDiscovery';
+import About from './pages/About';
 
 function App() {
   return (
     <BrowserRouter>
       <div className="App">
-        {/* Routes for different pages */}
+        {/* Navbar */}
+        <Navbar />
+
+        {/* Routes */}
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/navbar" element={<Navbar />} />
-          <Route path="/notifications" element={<Notification />} />
           <Route path="/login" element={<Login />} />
           <Route path="/match" element={<Matchmake />} />
           <Route path="/profile" element={<ProfileSetUp />} />
           <Route path="/register" element={<Register />} />
           <Route path="/userdiscovery" element={<UserDiscovery />} />
+          <Route path="/about" element={<About />} />
         </Routes>
 
         {/* Footer */}
-        <Footer />
+        {/* <Footer /> */}
       </div>
     </BrowserRouter>
   );
