@@ -14,7 +14,6 @@ const Register = () => {
   const [experience, setExperience] = useState(['', '', '']);
   const [availability, setAvailability] = useState('');
   const [charges, setCharges] = useState('');
-  const [learningMode, setLearningMode] = useState('');
   const [budget, setBudget] = useState('');
   const [photo, setPhoto] = useState(null);
   const [photoPreview, setPhotoPreview] = useState('');
@@ -30,24 +29,11 @@ const Register = () => {
     }
   };
 
-  const InputField = ({ label, type, placeholder, value, onChange }) => (
-    <div>
-      <label className="block text-gray-700 font-semibold mb-2">{label}</label>
-      <input
-        type={type}
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-        className="w-full p-3 border rounded-md focus:outline-none focus:ring focus:ring-blue-300"
-        required
-      />
-    </div>
-  );
-
   const handleSkillsChange = (index, value) => {
     const newSkills = [...skills];
     newSkills[index] = value;
     setSkills(newSkills);
+    // console.warn(skills)
   };
 
   const handleExperienceChange = (index, value) => {
@@ -59,18 +45,21 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true); // Start the loader
-    if(!photo || !name || !email || !mobile || !password || !skills) {
-      setLoading(false); // Stop the loader
-      toast.error('All fields are required, including photo', {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        transition: Bounce,
-      });
-      return;
+  
+    // Validate required fields
+    if (!photo || !name || !email || !mobile || !password || !skills.length) {
+        setLoading(false); // Stop the loader
+        toast.error('All fields are required, including photo and at least one skill.', {
+            position: "top-center",
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            transition: Bounce,
+        });
+        return;
     }
-
+  
+    // Prepare form data
     const formData = new FormData();
     formData.append('type', role);
     formData.append('name', name);
@@ -78,49 +67,63 @@ const Register = () => {
     formData.append('mobile', mobile);
     formData.append('password', password);
     formData.append('photo', photo);
-    formData.append('skills', skills.filter(skill => skill.trim() !== '').join(', '));
+  
+    // Append non-empty skills
+    skills.filter(skill => skill.trim() !== "").forEach((skill, index) => {
+        formData.append(`skills[${index}]`, skill);
+    });
+  
     if (role === 'mentor') {
-      formData.append('experience', experience.filter(exp => exp.trim() !== '').join(', '));
-      formData.append('availability', availability);
-      formData.append('charges', charges);
+        // Append non-empty experiences
+        experience.filter(exp => exp.trim() !== "").forEach((exp, index) => {
+            formData.append(`experience[${index}]`, exp);
+        });
+        formData.append('availability', availability || '');
+        formData.append('charges', charges || 0);
     }
 
     try {
-      const response = await fetch('http://localhost:5001/register', {
-        method: 'POST',
-        body: formData,
-      });
-      const result = await response.json();
-      setLoading(false); // Stop the loader
-      if (response.ok) {
-        toast.success('Registration successful!', {
-          position: "top-center",
-          autoClose: 3000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          transition: Bounce,
+        const response = await fetch('http://localhost:5001/register', {
+            method: 'POST',
+            body: formData,
         });
-      } else {
-        toast.error('Registration failed: ' + result.error, {
-          position: "top-center",
-          autoClose: 3000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          transition: Bounce,
-        });
-      }
+
+        const result = await response.json();
+        setLoading(false); // Stop the loader
+
+        if (response.ok) {
+            toast.success('Registration successful!', {
+                position: "top-center",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                transition: Bounce,
+            });
+        } else {
+            toast.error(`Registration failed: ${result.error || 'Unknown error'}`, {
+                position: "top-center",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                transition: Bounce,
+            });
+        }
     } catch (error) {
-      setLoading(false); // Stop the loader in case of an error
-      console.error('Error:', error);
-      toast.error('An error occurred. Please try again later.', {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        transition: Bounce,
-      });
+        setLoading(false); // Stop the loader in case of an error
+        console.error('Error:', error);
+        toast.error('An error occurred. Please try again later.', {
+            position: "top-center",
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            transition: Bounce,
+        });
     }
-  };
+};
+
+  
+  
+
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-blue-600 via-pink-400 to-red-500 flex items-center justify-center p-6">
@@ -173,13 +176,57 @@ const Register = () => {
               <p className="text-sm text-gray-500 mt-2">Click to upload your profile photo</p>
             </div>
 
-            <InputField label="Full Name" type="text" placeholder="Enter your full name" value={name} onChange={(e) => setName(e.target.value)} />
-            <InputField label="Email" type="email" placeholder="Enter your email" value={email} onChange={(e) => setEmail(e.target.value)} />
-            <InputField label="Password" type="password" placeholder="Enter a secure password" value={password} onChange={(e) => setPassword(e.target.value)} />
-            <InputField label="Mobile Number" type="tel" placeholder="Enter your 10-digit mobile number" value={mobile} onChange={(e) => setMobile(e.target.value)} />
+            {/* Full Name */}
+            <div className="mb-4">
+              <label className="block text-gray-700 font-semibold mb-2">Full Name</label>
+              <input
+                type="text"
+                placeholder="Enter your full name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full p-3 border rounded-md focus:outline-none focus:ring focus:ring-blue-300"
+              />
+            </div>
+
+            {/* Email */}
+            <div className="mb-4">
+              <label className="block text-gray-700 font-semibold mb-2">Email</label>
+              <input
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full p-3 border rounded-md focus:outline-none focus:ring focus:ring-blue-300"
+              />
+            </div>
+
+            {/* Password */}
+            <div className="mb-4">
+              <label className="block text-gray-700 font-semibold mb-2">Password</label>
+              <input
+                type="password"
+                placeholder="Enter a secure password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full p-3 border rounded-md focus:outline-none focus:ring focus:ring-blue-300"
+              />
+            </div>
+
+            {/* Mobile Number */}
+            <div className="mb-4">
+              <label className="block text-gray-700 font-semibold mb-2">Mobile Number</label>
+              <input
+                type="tel"
+                placeholder="Enter your 10-digit mobile number"
+                value={mobile}
+                onChange={(e) => setMobile(e.target.value)}
+                className="w-full p-3 border rounded-md focus:outline-none focus:ring focus:ring-blue-300"
+              />
+            </div>
 
             {role === 'mentor' && (
               <>
+                {/* Skills */}
                 <div>
                   <label className="block text-gray-700 font-semibold mb-2">Skills You Want to Teach (upto 5)</label>
                   {skills.map((skill, index) => (
@@ -193,6 +240,7 @@ const Register = () => {
                     />
                   ))}
                 </div>
+                {/* Experience */}
                 <div>
                   <label className="block text-gray-700 font-semibold mb-2">Experience (upto 5)</label>
                   {experience.map((exp, index) => (
@@ -206,6 +254,7 @@ const Register = () => {
                     />
                   ))}
                 </div>
+                {/* Availability */}
                 <div>
                   <label className="block text-gray-700 font-semibold mb-2">Availability</label>
                   <select
@@ -221,12 +270,23 @@ const Register = () => {
                     <option value="Flexible">Flexible</option>
                   </select>
                 </div>
-                <InputField label="Expected Charges (per hour in INR)" type="number" placeholder="E.g., 50 USD" value={charges} onChange={(e) => setCharges(e.target.value)} />
+                {/* Charges */}
+                <div className="mb-4">
+                  <label className="block text-gray-700 font-semibold mb-2">Expected Charges (per hour in INR)</label>
+                  <input
+                    type="number"
+                    placeholder="E.g., 50 USD"
+                    value={charges}
+                    onChange={(e) => setCharges(e.target.value)}
+                    className="w-full p-3 border rounded-md focus:outline-none focus:ring focus:ring-blue-300"
+                  />
+                </div>
               </>
             )}
 
             {role === 'mentee' && (
               <>
+                {/* Skills */}
                 <div>
                   <label className="block text-gray-700 font-semibold mb-2">Skills You Want to Learn (upto 5)</label>
                   {skills.map((skill, index) => (
@@ -240,30 +300,35 @@ const Register = () => {
                     />
                   ))}
                 </div>
-                <InputField label="Budget (in INR)" type="number" placeholder="Enter your budget (e.g., 100 USD)" value={budget} onChange={(e) => setBudget(e.target.value)} />
+                {/* Budget */}
+                <div className="mb-4">
+                  <label className="block text-gray-700 font-semibold mb-2">Budget (in INR)</label>
+                  <input
+                    type="number"
+                    placeholder="Enter your budget (e.g., 100 USD)"
+                    value={budget}
+                    onChange={(e) => setBudget(e.target.value)}
+                    className="w-full p-3 border rounded-md focus:outline-none focus:ring focus:ring-blue-300"
+                  />
+                </div>
               </>
             )}
 
             <button
               type="submit"
-              className="w-full bg-purple-500 text-white py-3 rounded-md hover:bg-purple-600 transition"
+              className="w-full bg-purple-600 text-white py-3 rounded-md text-lg font-semibold transition hover:bg-purple-700 focus:outline-none focus:ring focus:ring-blue-300"
             >
-              {loading ? <RingLoader color="#fff" size={24} /> : `Register as ${role.charAt(0).toUpperCase() + role.slice(1)}`}
+              {loading ? <RingLoader size={30} color="#fff" /> : 'Register'}
             </button>
-
-            <div className="text-center mt-4">
-              <p className="text-sm text-gray-600">
-                Already have an account?{' '}
-                <Link to="/login" className="text-purple-500 hover:underline">
-                  Log in here
-                </Link>
-              </p>
-            </div>
           </form>
-
         )}
-      </div>
 
+        <div className="text-center mt-4">
+          <p className="text-sm text-gray-600">
+            Already have an account? <Link to="/login" className="text-purple-600">Login here</Link>
+          </p>
+        </div>
+      </div>
       <ToastContainer />
     </div>
   );

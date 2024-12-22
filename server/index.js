@@ -9,6 +9,9 @@ import Mentee from './schema/Mentee.js';
 import './db/config.js';
 import { hash, compare } from 'bcrypt';
 import jwt from 'jsonwebtoken';
+// const http = require("http");
+// const { Server } = require("socket.io");
+
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -27,6 +30,34 @@ app.use(json());
 app.use(cors({ origin: '*', methods: ['GET', 'POST', 'PUT', 'DELETE'] }));
 app.use(fileUpload({ useTempFiles: true }));
 
+// const server = http.createServer(app);
+// const io = new Server(server, {
+//   cors: {
+//     origin: "http://localhost:3000", 
+//     methods: ["GET", "POST"],
+//   },
+// });
+
+// io.on("connection", (socket) => {
+//   console.log("User is connected");
+
+//   // Join a room
+//   socket.on("joinRoom", (roomId) => {
+//     socket.join(roomId);
+//     console.log(`User joined room: ${roomId}`);
+//   });
+
+//   // Handle sending messages
+//   socket.on("sendMessage", ({ roomId, message }) => {
+//     io.to(roomId).emit("receiveMessage", message);
+//   });
+
+//   socket.on("disconnect", () => {
+//     console.log("A user disconnected");
+//   });
+// });
+
+
 
 // Helper function for user queries
 const getUsers = async (model, query, resp) => {
@@ -42,7 +73,7 @@ const getUsers = async (model, query, resp) => {
 // Register API
 app.post('/register', async (req, res) => {
     try {
-        const { type, name, email, mobile, password, skills, experience, availability } = req.body;
+        const { type, name, email, mobile, password, skills, experience, availability, charges } = req.body;
 
         // Check if the file is uploaded and is an image
         if (!req.files || !req.files.photo) {
@@ -61,8 +92,17 @@ app.post('/register', async (req, res) => {
         if (!type || !name || !email || !mobile || !password || !skills) {
             return res.status(400).json({
                 error: 'All fields are required, including photo',
-                missingFields: { type, name, email, mobile, password, skills, photo: photo },
+                missingFields: { type, name, email, mobile, password, skills },
             });
+        }
+
+        // Parse skills and experience if they are sent as JSON strings
+        const parsedSkills = JSON.parse(skills || '[]');
+        const parsedExperience = type === 'mentor' ? JSON.parse(experience || '[]') : [];
+
+        // Check if skills array is empty
+        if (parsedSkills.length === 0) {
+            return res.status(400).json({ error: 'At least one skill is required' });
         }
 
         // Check if the email or mobile is already taken
@@ -90,9 +130,9 @@ app.post('/register', async (req, res) => {
             email,
             mobile,
             password: hashedPassword,
-            skills,
+            skills: parsedSkills,
             type,
-            ...(type === 'mentor' && { experience, availability }), // Include mentor-specific fields
+            ...(type === 'mentor' && { experience: parsedExperience, availability, charges }), // Include mentor-specific fields
             photo: uploadResult.secure_url, // Use secure URL from Cloudinary
         });
 
@@ -107,6 +147,7 @@ app.post('/register', async (req, res) => {
         res.status(500).json({ error: 'Internal server error', details: error.message });
     }
 });
+
 
 // Login API
 app.post('/login', async (req, resp) => {

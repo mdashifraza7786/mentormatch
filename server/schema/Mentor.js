@@ -46,6 +46,10 @@ const MentorSchema = new mongoose.Schema({
     type: [String],
     default: ['Flexible'],
   },
+  charges: {
+    require: true,
+    type: String,
+  },
   mentees: [
     {
       menteeId: {

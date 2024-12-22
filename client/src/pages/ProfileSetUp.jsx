@@ -1,7 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
-const ProfileSetUp = () => {
+const ProfileSetUp = ({ userId }) => {
   const [profileImage, setProfileImage] = useState(null);
+  const [formData, setFormData] = useState({
+    fullName: "",
+    bio: "",
+    skills: "",
+    availability: "",
+  });
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -9,6 +20,38 @@ const ProfileSetUp = () => {
       const reader = new FileReader();
       reader.onload = () => setProfileImage(reader.result);
       reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch(`/user/${userId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fullName: formData.fullName,
+          bio: formData.bio,
+          skills: formData.skills,
+          availability: formData.availability,
+          profileImage, // Include the base64 image if uploaded
+        }),
+      });
+
+      if (response.ok) {
+        const updatedUser = await response.json();
+        alert("Profile updated successfully!");
+        console.log("Updated User:", updatedUser);
+      } else {
+        const error = await response.json();
+        alert(error.error || "Failed to update profile");
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      alert("An error occurred while updating the profile.");
     }
   };
 
@@ -26,7 +69,7 @@ const ProfileSetUp = () => {
       <main className="container mx-auto px-6 py-12">
         <div className="bg-white shadow-lg rounded-lg p-8 md:p-12">
           <h2 className="text-3xl font-semibold text-center mb-8">Complete Your Profile</h2>
-          <form>
+          <form onSubmit={handleSubmit}>
             {/* Profile Picture */}
             <div className="mb-8 text-center">
               <label className="block text-lg font-medium mb-2">Profile Picture</label>
@@ -56,6 +99,9 @@ const ProfileSetUp = () => {
               <label className="block text-lg font-medium mb-2">Full Name</label>
               <input
                 type="text"
+                name="fullName"
+                value={formData.fullName}
+                onChange={handleInputChange}
                 className="w-full border border-gray-300 rounded-md p-3"
                 placeholder="Enter your full name"
               />
@@ -65,6 +111,9 @@ const ProfileSetUp = () => {
             <div className="mb-6">
               <label className="block text-lg font-medium mb-2">Bio</label>
               <textarea
+                name="bio"
+                value={formData.bio}
+                onChange={handleInputChange}
                 className="w-full border border-gray-300 rounded-md p-3"
                 rows="4"
                 placeholder="Write a short bio about yourself..."
@@ -75,6 +124,9 @@ const ProfileSetUp = () => {
             <div className="mb-6">
               <label className="block text-lg font-medium mb-2">Skills</label>
               <textarea
+                name="skills"
+                value={formData.skills}
+                onChange={handleInputChange}
                 className="w-full border border-gray-300 rounded-md p-3"
                 rows="3"
                 placeholder="E.g., Python, Public Speaking, Time Management"
@@ -86,6 +138,9 @@ const ProfileSetUp = () => {
               <label className="block text-lg font-medium mb-2">Availability</label>
               <input
                 type="text"
+                name="availability"
+                value={formData.availability}
+                onChange={handleInputChange}
                 className="w-full border border-gray-300 rounded-md p-3"
                 placeholder="E.g., Weekends, Weekday Evenings"
               />
