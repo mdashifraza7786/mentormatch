@@ -45,20 +45,20 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true); // Start the loader
-  
+
     // Validate required fields
     if (!photo || !name || !email || !mobile || !password || !skills.length) {
-        setLoading(false); // Stop the loader
-        toast.error('All fields are required, including photo and at least one skill.', {
-            position: "top-center",
-            autoClose: 3000,
-            hideProgressBar: true,
-            closeOnClick: true,
-            transition: Bounce,
-        });
-        return;
+      setLoading(false); // Stop the loader
+      toast.error('All fields are required, including photo and at least one skill.', {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        transition: Bounce,
+      });
+      return;
     }
-  
+
     // Prepare form data
     const formData = new FormData();
     formData.append('type', role);
@@ -67,62 +67,66 @@ const Register = () => {
     formData.append('mobile', mobile);
     formData.append('password', password);
     formData.append('photo', photo);
-  
+
     // Append non-empty skills
     skills.filter(skill => skill.trim() !== "").forEach((skill, index) => {
-        formData.append(`skills[${index}]`, skill);
+      formData.append(`skills[${index}]`, skill);
     });
-  
+
     if (role === 'mentor') {
-        // Append non-empty experiences
-        experience.filter(exp => exp.trim() !== "").forEach((exp, index) => {
-            formData.append(`experience[${index}]`, exp);
-        });
-        formData.append('availability', availability || '');
-        formData.append('charges', charges || 0);
+      // Append non-empty experiences
+      experience.filter(exp => exp.trim() !== "").forEach((exp, index) => {
+        formData.append(`experience[${index}]`, exp);
+      });
+      formData.append('availability', availability || '');
+      formData.append('charges', charges || 0);
     }
 
+    formData.forEach((value, key) => {
+      console.log(`${key}: ${value}`);
+    });
+    
     try {
-        const response = await fetch('http://localhost:5001/register', {
-            method: 'POST',
-            body: formData,
+      const response = await fetch('https://mentormatch-ewws.onrender.com/register', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+      setLoading(false); // Stop the loader
+
+      if (response.ok) {
+        toast.success('Registration successful!', {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          transition: Bounce,
         });
-
-        const result = await response.json();
-        setLoading(false); // Stop the loader
-
-        if (response.ok) {
-            toast.success('Registration successful!', {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                transition: Bounce,
-            });
-        } else {
-            toast.error(`Registration failed: ${result.error || 'Unknown error'}`, {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                transition: Bounce,
-            });
-        }
+      } else {
+        toast.error(`Registration failed: ${result.error || 'Unknown error'}`, {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          transition: Bounce,
+        });
+      }
     } catch (error) {
-        setLoading(false); // Stop the loader in case of an error
-        console.error('Error:', error);
-        toast.error('An error occurred. Please try again later.', {
-            position: "top-center",
-            autoClose: 3000,
-            hideProgressBar: true,
-            closeOnClick: true,
-            transition: Bounce,
-        });
+      setLoading(false); // Stop the loader in case of an error
+      console.error('Error:', error);
+      toast.error('An error occurred. Please try again later.', {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        transition: Bounce,
+      });
     }
-};
+  };
 
-  
-  
+
+
 
 
   return (

@@ -105,7 +105,7 @@ const Mentor = () => {
 
               {/* Chat Now Button */}
               <button className="mt-auto bg-green-500 text-white font-bold shadow-lg py-2 px-4 rounded-lg w-full hover:bg-green-600 transition">
-                Fuck Now
+                Chat Now
               </button>
             </div>
           ))

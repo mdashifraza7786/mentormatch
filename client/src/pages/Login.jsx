@@ -3,6 +3,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { RingLoader } from 'react-spinners';
 import { FaGithub } from "react-icons/fa";
+import { Navigate } from 'react-router-dom';
 
 const Login = () => {
   const [emailOrMobile, setEmailOrMobile] = useState('');
@@ -23,13 +24,26 @@ const Login = () => {
       return;
     }
 
-    // Handle form submission (this could be an API call)
     try {
-      // Simulate a login API call
-      await new Promise((resolve) => setTimeout(resolve, 2000)); // simulate delay
-      toast.success('Login successful!');
+      const response = await fetch('https://mentormatch-ewws.onrender.com/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ emailOrMobile, password }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to login. Please check your credentials.');
+      }
+
+      const data = await response.json();
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      Navigate('/');
+      toast.success(data.message || 'Login successful!');
     } catch (error) {
-      toast.error('Login failed. Please try again.');
+      toast.error(error.message || 'Login failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -38,13 +52,11 @@ const Login = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-600 via-pink-400 to-red-500">
       <div className="bg-white shadow-xl rounded-lg p-8 w-full max-w-md">
-        {/* Header Section */}
         <div className="text-center mb-6">
           <h2 className="text-4xl font-extrabold text-gray-800">MentorMatch</h2>
           <p className="text-gray-600 mt-2">Connect, Learn, and Grow</p>
         </div>
 
-        {/* Login Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="emailOrMobile" className="block text-gray-700 font-medium mb-1">
@@ -76,7 +88,6 @@ const Login = () => {
             />
           </div>
 
-          {/* Remember Me & Forgot Password */}
           <div className="flex items-center justify-between text-sm">
             <label className="flex items-center text-gray-600">
               <input type="checkbox" className="mr-2" />
@@ -87,7 +98,6 @@ const Login = () => {
             </a>
           </div>
 
-          {/* Login Button */}
           <button
             type="submit"
             className="w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition duration-300"
@@ -97,14 +107,12 @@ const Login = () => {
           </button>
         </form>
 
-        {/* Divider */}
         <div className="flex items-center my-6">
           <hr className="flex-1 border-gray-300" />
           <span className="px-4 text-gray-500">OR</span>
           <hr className="flex-1 border-gray-300" />
         </div>
 
-        {/* Social Login Buttons */}
         <div className="space-y-3">
           <button
             type="button"
@@ -122,12 +130,11 @@ const Login = () => {
             type="button"
             className="flex gap-2 items-center justify-center w-full bg-gray-100 py-2 border rounded-lg hover:bg-gray-200 transition duration-300"
           >
-           <FaGithub />
-           <span> Login with GitHub</span>
+            <FaGithub />
+            <span> Login with GitHub</span>
           </button>
         </div>
 
-        {/* Footer Section */}
         <p className="text-center text-gray-600 mt-6 text-sm">
           New to MentorMatch?{' '}
           <a href="/register" className="text-purple-500 hover:underline font-medium">
