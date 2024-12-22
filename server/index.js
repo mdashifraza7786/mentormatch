@@ -75,59 +75,47 @@ app.post('/register', async (req, res) => {
     try {
         const { type, name, email, mobile, password, skills, experience, availability, charges } = req.body;
 
-        // Validate required fields
-        if (!type || !name || !email || !mobile || !password) {
-            return res.status(400).json({ error: "All fields are required" });
-        }
-
-        // Validate email
-        if (!validator.isEmail(email)) {
-            return res.status(400).json({ error: "Invalid email address" });
-        }
-
-        // Validate mobile number
-        if (!validator.isMobilePhone(mobile, 'any')) {
-            return res.status(400).json({ error: "Invalid mobile number" });
-        }
-
-        // Validate photo upload
+        // Check if the file is uploaded and is an image
         if (!req.files || !req.files.photo) {
             return res.status(400).json({ error: "No photo uploaded" });
         }
-        const { photo } = req.files;
+
+        const photo = req.files.photo;
+
+        // Validate file type (check if it's an image)
         const validImageTypes = ['image/jpeg', 'image/png', 'image/gif'];
         if (!validImageTypes.includes(photo.mimetype)) {
-            return res.status(400).json({ error: "Uploaded file must be a valid image" });
+            return res.status(400).json({ error: "Uploaded file is not a valid image" });
         }
 
-        // Parse skills and experience
-        const parsedSkills = Array.isArray(skills) ? skills : JSON.parse(skills || '[]');
-        const parsedExperience =
-            type === 'mentor'
-                ? Array.isArray(experience) ? experience : JSON.parse(experience || '[]')
-                : [];
-
-        // Validate skills
-        if (parsedSkills.length === 0 || parsedSkills.some(skill => typeof skill !== 'string' || !skill.trim())) {
-            return res.status(400).json({ error: "Skills must contain at least one valid entry" });
+        // Validate required fields
+        if (!type || !name || !email || !mobile || !password || !Array.isArray(skills) || skills.length === 0) {
+            return res.status(400).json({
+                error: `All fields are required, including photo ${Array.isArray(skills)}, ${skills.length}, ${skills}`,
+                missingFields: { type, name, email, mobile, password, skills },
+            });
         }
 
-        // Validate experience (if mentor)
-        if (type === 'mentor' && parsedExperience.some(exp => typeof exp !== 'string' || !exp.trim())) {
-            return res.status(400).json({ error: "Experience contains invalid values" });
+        // Parse skills and experience if they are sent as JSON strings
+        const parsedSkills = JSON.parse(skills || '[]');
+        const parsedExperience = type === 'mentor' ? JSON.parse(experience || '[]') : [];
+
+        // Check if skills array is empty
+        if (parsedSkills.length === 0) {
+            return res.status(400).json({ error: 'At least one skill is required' });
         }
 
-        // Check if email or mobile is already registered
+        // Check if the email or mobile is already taken
         const existingUser = await Mentor.findOne({ email }) || await Mentee.findOne({ email }) ||
             await Mentor.findOne({ mobile }) || await Mentee.findOne({ mobile });
         if (existingUser) {
-            return res.status(400).json({ error: "Email or mobile number is already registered" });
+            return res.status(400).json({ error: 'Email or Mobile is already registered' });
         }
 
         // Determine user type
         const UserModel = type === 'mentor' ? Mentor : type === 'mentee' ? Mentee : null;
         if (!UserModel) {
-            return res.status(400).json({ error: "Invalid user type" });
+            return res.status(400).json({ error: 'Invalid user type' });
         }
 
         // Upload photo to Cloudinary
@@ -138,17 +126,13 @@ app.post('/register', async (req, res) => {
 
         // Create and save user
         const user = new UserModel({
-            name: validator.escape(name),
+            name,
             email,
             mobile,
             password: hashedPassword,
-            skills: parsedSkills.map(skill => validator.escape(skill)),
+            skills: parsedSkills,
             type,
-            ...(type === 'mentor' && {
-                experience: parsedExperience.map(exp => validator.escape(exp)),
-                availability: validator.escape(availability || ''),
-                charges: charges || 0,
-            }),
+            ...(type === 'mentor' && { experience: parsedExperience, availability, charges }), // Include mentor-specific fields
             photo: uploadResult.secure_url, // Use secure URL from Cloudinary
         });
 
