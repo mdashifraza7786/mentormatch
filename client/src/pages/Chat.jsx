@@ -4,27 +4,27 @@ import io from "socket.io-client";
 const Chat = ({ userId, mentorId }) => {
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(true); // Loader state
+  const [isLoading, setIsLoading] = useState(true);
   const socket = useRef(null);
   const chatEndRef = useRef(null);
 
   useEffect(() => {
-    // Connect to the Socket.io server
-    socket.current = io("http://localhost:5000"); // Replace with your backend URL
+    // Connect to the Socket.IO server
+    socket.current = io("https://mentor-match-backend.onrender.com"); // Replace with your backend URL
 
-    // Join a specific room for mentor-mentee chat
     const roomId = `${userId}-${mentorId}`;
     socket.current.emit("joinRoom", roomId);
+
+    // Fetch chat history
+    socket.current.on("chatHistory", (chatHistory) => {
+      setMessages(chatHistory);
+      setIsLoading(false); // Stop the loader once history is loaded
+    });
 
     // Listen for incoming messages
     socket.current.on("receiveMessage", (message) => {
       setMessages((prev) => [...prev, message]);
     });
-
-    // Simulate initial loading for demonstration
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1000); // Adjust the duration as needed
 
     // Cleanup on component unmount
     return () => {
@@ -41,18 +41,16 @@ const Chat = ({ userId, mentorId }) => {
       timestamp: new Date(),
     };
 
-    // Emit the message to the server
     socket.current.emit("sendMessage", {
       roomId: `${userId}-${mentorId}`,
       message,
     });
 
-    // Update the chat UI locally
+    // Optimistically update the chat UI
     setMessages((prev) => [...prev, message]);
     setInputMessage("");
   };
 
-  // Scroll to the latest message
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
