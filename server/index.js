@@ -6,11 +6,13 @@ import { v2 as cloudinary } from 'cloudinary';
 import fileUpload from 'express-fileupload';
 import Mentor from './schema/Mentor.js';
 import Mentee from './schema/Mentee.js';
+import Chat from './schema/Chat.js';
+import Message from './schema/Message.js';
 import './db/config.js';
 import { hash, compare } from 'bcrypt';
 import jwt from 'jsonwebtoken';
-// const http = require("http");
-// const { Server } = require("socket.io");
+import http from 'http';
+import { Server } from 'socket.io';
 
 
 const app = express();
@@ -30,33 +32,68 @@ app.use(json());
 app.use(cors({ origin: '*', methods: ['GET', 'POST', 'PUT', 'DELETE'] }));
 app.use(fileUpload({ useTempFiles: true }));
 
-// const server = http.createServer(app);
-// const io = new Server(server, {
-//   cors: {
-//     origin: "http://localhost:3000", 
-//     methods: ["GET", "POST"],
-//   },
-// });
+const server = http.createServer(app);
 
-// io.on("connection", (socket) => {
-//   console.log("User is connected");
+const io = new Server(server, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"],
+    },
+});
 
-//   // Join a room
-//   socket.on("joinRoom", (roomId) => {
-//     socket.join(roomId);
-//     console.log(`User joined room: ${roomId}`);
-//   });
+io.on("connection", (socket) => {
+    console.log("User connected:", socket.id);
 
-//   // Handle sending messages
-//   socket.on("sendMessage", ({ roomId, message }) => {
-//     io.to(roomId).emit("receiveMessage", message);
-//   });
+    // Join a room
+    socket.on("joinRoom", async (roomId) => {
+        socket.join(roomId);
+        console.log(`User joined room: ${roomId}`);
 
-//   socket.on("disconnect", () => {
-//     console.log("A user disconnected");
-//   });
-// });
+        // Send chat history to the user
+        const messages = await Message.find({ chatId: roomId }).sort({ timestamp: 1 });
+        socket.emit("chatHistory", messages);
+    });
 
+    // Handle sending messages
+    socket.on("sendMessage", async ({ roomId, senderId, text }) => {
+        try {
+            // Store the message in the database
+            const newMessage = new Message({
+                chatId: roomId,
+                senderId,
+                text,
+            });
+            await newMessage.save();
+
+            // Update the last message in the chat
+            await Chat.findOneAndUpdate(
+                { roomId },
+                {
+                    lastMessage: {
+                        senderId,
+                        text,
+                        timestamp: new Date(),
+                    },
+                }
+            );
+
+            // Broadcast the message to the room
+            const message = {
+                chatId: roomId,
+                senderId,
+                text,
+                timestamp: newMessage.timestamp,
+            };
+            io.to(roomId).emit("receiveMessage", message);
+        } catch (error) {
+            console.error("Error saving message:", error);
+        }
+    });
+
+    socket.on("disconnect", () => {
+        console.log("User disconnected:", socket.id);
+    });
+});
 
 
 // Helper function for user queries
@@ -161,8 +198,8 @@ app.post('/login', async (req, res) => {
         const fieldName = emailRegex.test(identifier)
             ? 'email'
             : mobileRegex.test(identifier)
-            ? 'mobile'
-            : null;
+                ? 'mobile'
+                : null;
 
         if (!fieldName) {
             return res.status(400).json({ error: "Invalid identifier format. Use a valid email or mobile number." });
