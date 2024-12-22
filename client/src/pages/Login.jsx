@@ -3,44 +3,47 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { RingLoader } from 'react-spinners';
 import { FaGithub } from "react-icons/fa";
-import { Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
-  const [emailOrMobile, setEmailOrMobile] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    // Validate email or mobile
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    const mobileRegex = /^[0-9]{10}$/;
-
-    if (!emailOrMobile.match(emailRegex) && !emailOrMobile.match(mobileRegex)) {
-      toast.error('Please enter a valid email or mobile number.');
-      setLoading(false);
-      return;
-    }
-
     try {
+      // Validate email or mobile
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      const mobileRegex = /^[0-9]{10}$/;
+
+      if (!emailRegex.test(identifier) && !mobileRegex.test(identifier)) {
+        toast.error('Please enter a valid email or mobile number.');
+        setLoading(false);
+        return;
+      }
+
+      // API call
       const response = await fetch('https://mentormatch-ewws.onrender.com/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ emailOrMobile, password }),
+        body: JSON.stringify({ identifier, password }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to login. Please check your credentials.');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to login. Please check your credentials.');
       }
 
       const data = await response.json();
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
-      Navigate('/');
+      navigate('/');
       toast.success(data.message || 'Login successful!');
     } catch (error) {
       toast.error(error.message || 'Login failed. Please try again.');
@@ -66,8 +69,8 @@ const Login = () => {
               type="text"
               id="emailOrMobile"
               placeholder="you@example.com or 1234567890"
-              value={emailOrMobile}
-              onChange={(e) => setEmailOrMobile(e.target.value)}
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none transition"
               required
             />
@@ -131,7 +134,7 @@ const Login = () => {
             className="flex gap-2 items-center justify-center w-full bg-gray-100 py-2 border rounded-lg hover:bg-gray-200 transition duration-300"
           >
             <FaGithub />
-            <span> Login with GitHub</span>
+            <span>Login with GitHub</span>
           </button>
         </div>
 
