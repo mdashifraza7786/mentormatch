@@ -150,27 +150,49 @@ app.post('/register', async (req, res) => {
 
 
 // Login API
-app.post('/login', async (req, resp) => {
+app.post('/login', async (req, res) => {
     try {
         const { identifier, password } = req.body;
+
+        // Validate identifier format (email or mobile)
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const mobileRegex = /^[0-9]{10}$/;
 
-        const fieldName = emailRegex.test(identifier) ? 'email' : mobileRegex.test(identifier) ? 'mobile' : null;
-        if (!fieldName) return resp.status(400).send({ error: "Invalid identifier format" });
+        const fieldName = emailRegex.test(identifier)
+            ? 'email'
+            : mobileRegex.test(identifier)
+            ? 'mobile'
+            : null;
 
-        const user = await Mentor.findOne({ [fieldName]: identifier }) || await Mentee.findOne({ [fieldName]: identifier });
-        if (!user || !(await compare(password, user.password))) {
-            return resp.status(401).send({ error: "Invalid credentials" });
+        if (!fieldName) {
+            return res.status(400).json({ error: "Invalid identifier format. Use a valid email or mobile number." });
         }
 
-        const token = jwt.sign({ id: user._id, type: user instanceof Mentor ? 'mentor' : 'mentee' }, jwtKey, { expiresIn: "26h" });
-        resp.send({ user, auth: token });
+        // Find user in Mentor or Mentee collections
+        const user =
+            await Mentor.findOne({ [fieldName]: identifier }) ||
+            await Mentee.findOne({ [fieldName]: identifier });
+
+        // Check if user exists and password is correct
+        if (!user || !(await compare(password, user.password))) {
+            return res.status(401).json({ error: "Invalid email/mobile or password." });
+        }
+
+        // Generate JWT token
+        const token = jwt.sign(
+            { id: user._id, type: user instanceof Mentor ? 'mentor' : 'mentee' },
+            jwtKey,
+            { expiresIn: "26h" }
+        );
+
+        // Send user data and token
+        res.status(200).json({ user, auth: token });
     } catch (error) {
         console.error("Login error:", error);
-        resp.status(500).send({ error: "Something went wrong" });
+        res.status(500).json({ error: "Internal server error. Please try again later.", details: error.message });
     }
 });
+
 
 // Get all mentors API
 app.get('/allmentors', async (req, resp) => {
