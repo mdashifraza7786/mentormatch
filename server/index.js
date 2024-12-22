@@ -77,7 +77,7 @@ app.post('/register', async (req, res) => {
 
         // Check if the file is uploaded and is an image
         if (!req.files || !req.files.photo) {
-            return res.status(400).json({ message: "No photo uploaded" });
+            return res.status(400).json({ error: "No photo uploaded" });
         }
 
         const photo = req.files.photo;
@@ -87,28 +87,9 @@ app.post('/register', async (req, res) => {
         if (!validImageTypes.includes(photo.mimetype)) {
             return res.status(400).json({ error: "Uploaded file is not a valid image" });
         }
-        if(!type) {
-            return res.status(400).json({ error: "Please select a user type" });
-        }
-        if(!name) {
-            return res.status(400).json({ error: "Please enter your name" });
-        }
-        if(!email) {
-            return res.status(400).json({ error: "Please enter your email" });
-        }
-        if(!mobile) {
-            return res.status(400).json({ error: "Please enter your mobile number" });
-        }
-        if(!password) {
-            return res.status(400).json({ error: "Please enter a password" });
-        }
-        if(!skills) {
-            return res.status(400).json({ error: "Please enter your skills" });
-        }
-
 
         // Validate required fields
-        if (!type || !name || !email || !mobile || !password || !skills) {
+        if (!type || !name || !email || !mobile || !password || !Array.isArray(skills) || skills.length === 0) {
             return res.status(400).json({
                 error: 'All fields are required, including photo',
                 missingFields: { type, name, email, mobile, password, skills },
