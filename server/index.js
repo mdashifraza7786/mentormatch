@@ -91,7 +91,7 @@ app.post('/register', async (req, res) => {
         // Validate required fields
         if (!type || !name || !email || !mobile || !password || !Array.isArray(skills) || skills.length === 0) {
             return res.status(400).json({
-                error: 'All fields are required, including photo',
+                error: `All fields are required, including photo ${Array.isArray(skills)}, ${skills.length}, ${skills}`,
                 missingFields: { type, name, email, mobile, password, skills },
             });
         }
