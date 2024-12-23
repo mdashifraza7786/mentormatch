@@ -231,6 +231,7 @@ const Register = () => {
                     />
                   ))}
                 </div>
+
                 {/* Experience */}
                 <div>
                   <label className="block text-gray-700 font-semibold mb-2">Experience (upto 5)</label>
@@ -245,6 +246,7 @@ const Register = () => {
                     />
                   ))}
                 </div>
+
                 {/* Availability */}
                 <div>
                   <label className="block text-gray-700 font-semibold mb-2">Availability</label>
@@ -261,6 +263,7 @@ const Register = () => {
                     <option value="Flexible">Flexible</option>
                   </select>
                 </div>
+
                 {/* Charges */}
                 <div className="mb-4">
                   <label className="block text-gray-700 font-semibold mb-2">Expected Charges (per hour in INR)</label>
@@ -291,6 +294,7 @@ const Register = () => {
                     />
                   ))}
                 </div>
+            
                 {/* Budget */}
                 <div className="mb-4">
                   <label className="block text-gray-700 font-semibold mb-2">Budget (in INR)</label>

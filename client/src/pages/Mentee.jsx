@@ -1,108 +1,167 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
+import { FaSearch, FaPhone, FaEnvelope, FaWallet } from "react-icons/fa";
 
 const Mentee = () => {
   const [mentees, setMentees] = useState([]);
-  const [filteredMentees, setFilteredMentees] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedSkills, setSelectedSkills] = useState([]);
+  const [loader, setLoader] = useState(false);
+
+  const fetchMentees = async (query = "") => {
+    setLoader(true);
+    try {
+      const url = `https://mentormatch-ewws.onrender.com/mentee${query}`;
+      const response = await fetch(url, { method: "GET" });
+      const data = await response.json();
+      setMentees(data);
+    } catch (error) {
+      console.error("Error fetching mentees:", error);
+    } finally {
+      setLoader(false);
+    }
+  };
+
+  const handleSearch = (event) => {
+    const value = event.target.value;
+    setSearchTerm(value);
+
+    // Fetch mentees based on search term or fetch all mentees if search term is empty
+    const query = value ? `?name=${value}` : "";
+    fetchMentees(query);
+  };
+
+  const handleSkillFilter = (skill) => {
+    const updatedSkills = selectedSkills.includes(skill)
+      ? selectedSkills.filter((s) => s !== skill)
+      : [...selectedSkills, skill];
+    setSelectedSkills(updatedSkills);
+
+    // Construct query based on selected skills
+    const query = updatedSkills.length ? `?skill=${updatedSkills.join(",")}` : "";
+    fetchMentees(query);
+  };
+
+  const handleChatClick = (menteeId) => {
+    // Redirect to chat page with mentee ID
+    window.location.href = `/chat/${menteeId}`;
+  };
 
   useEffect(() => {
-    const fetchMentees = async () => {
-      try {
-        const response = await fetch('/api/mentees'); // Replace with your API endpoint
-        const data = await response.json();
-        setMentees(data);
-        setFilteredMentees(data);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching mentee data:', error);
-        setLoading(false);
-      }
-    };
-
+    // Initial fetch to load all mentees
     fetchMentees();
   }, []);
 
-  const handleSearch = (event) => {
-    const term = event.target.value.toLowerCase();
-    setSearchTerm(term);
-    const filtered = mentees.filter(
-      (mentee) =>
-        mentee.name.toLowerCase().includes(term) ||
-        mentee.skills.some((skill) => skill.toLowerCase().includes(term))
-    );
-    setFilteredMentees(filtered);
-  };
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen bg-gray-50">
-        <p className="text-lg font-semibold text-gray-600">Loading...</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50 py-10 px-6">
-      <h1 className="text-4xl font-bold text-center text-blue-600 mb-8">Mentees</h1>
+    <div className="py-[5vh] px-[8vw] bg-gray-200 min-h-screen">
+      <h1 className="text-3xl font-bold text-center mb-6">Find Your Mentees</h1>
 
       {/* Search Bar */}
-      <div className="mb-8 flex justify-center">
-        <input
-          type="text"
-          value={searchTerm}
-          onChange={handleSearch}
-          placeholder="Search by name or skill..."
-          className="w-full max-w-md p-4 text-gray-800 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-4 focus:ring-blue-400"
-        />
+      <div className="flex justify-center mb-6">
+        <div className="relative w-full max-w-md">
+          <input
+            type="text"
+            className="w-full p-3 border border-gray-300 rounded-md"
+            placeholder="Search for a mentee"
+            value={searchTerm}
+            onChange={handleSearch}
+          />
+          <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500">
+            <FaSearch className="w-5 h-5" />
+          </div>
+        </div>
       </div>
 
-      {/* Profile Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        {filteredMentees.length > 0 ? (
-          filteredMentees.map((mentee) => (
-            <div
-              key={mentee._id}
-              className="bg-white shadow-lg rounded-lg overflow-hidden transform hover:scale-105 transition-transform duration-300 border border-gray-200"
+      {/* Skills Filter */}
+      <div className="flex flex-wrap justify-center gap-4 mb-8">
+        {["Cricket", "Football", "AI/ML", "Coding", "Data Analyst", "Web Development"].map(
+          (skill) => (
+            <button
+              key={skill}
+              onClick={() => handleSkillFilter(skill)}
+              className={`${selectedSkills.includes(skill)
+                ? "bg-blue-500 text-white"
+                : "bg-[#F0EAEB] text-gray-700"
+                } border border-gray-300 p-2 px-4 rounded-lg cursor-pointer transition-all duration-300`}
             >
-              <img
-                src={mentee.photo}
-                alt={`${mentee.name}'s profile`}
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-6">
-                <h2 className="text-2xl font-semibold text-gray-800 mb-3">{mentee.name}</h2>
-                <p className="text-gray-600 mb-2">
-                  <strong>Email:</strong> {mentee.email}
-                </p>
-                <p className="text-gray-600 mb-2">
-                  <strong>Mobile:</strong> {mentee.mobile}
-                </p>
-                <p className="text-gray-600 mb-4">
-                  <strong>Bio:</strong> {mentee.bio || 'No bio available'}
-                </p>
-                <div>
-                  <h3 className="text-gray-700 font-medium mb-2">Skills:</h3>
-                  <ul className="flex flex-wrap gap-2">
-                    {mentee.skills.map((skill, index) => (
-                      <li
-                        key={index}
-                        className="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm shadow-sm"
-                      >
-                        {skill}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            </div>
-          ))
-        ) : (
-          <p className="text-gray-600 text-center col-span-full">
-            No mentees match your search.
-          </p>
+              {skill}
+            </button>
+          )
         )}
       </div>
+
+      {/* Mentee Cards */}
+      {loader ? (
+        <div className="flex justify-center items-center h-[70vh]">
+          <div className="w-48 h-48 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      ) : (
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-8 px-8">
+          {mentees.length > 0 ? (
+            mentees.map((mentee) => (
+              <div
+                key={mentee._id}
+                className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition flex flex-col"
+              >
+                <div className="flex flex-col md:flex-row items-start md:items-center gap-6 m-4">
+                  <img
+                    src={mentee.photo || "https://via.placeholder.com/150"}
+                    alt={mentee.name}
+                    className="w-52 h-52 rounded-md object-cover shadow-md"
+                  />
+                  <div className="flex flex-col gap-4">
+                    <h2 className="text-2xl font-bold text-gray-800">{mentee.name}</h2>
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+                      <p className="text-sm text-gray-600 flex items-center gap-2">
+                        <FaEnvelope className="text-gray-500" /> {mentee.email || "N/A"}
+                      </p>
+                      <p className="text-sm text-gray-600 flex items-center gap-2">
+                        <FaPhone className="text-gray-500" /> {mentee.mobile ? `+91-${mentee.mobile}` : "N/A"}
+                      </p>
+                    </div>
+                    <p className="text-sm text-gray-600">
+                      <span className="font-semibold">Availability:</span>{" "}
+                      {mentee.availability || "N/A"}
+                    </p>
+                    {/* <p className="text-sm text-gray-600">
+                      <span className="font-semibold">Experience:</span>
+                      <ul className="list-disc pl-5 mt-1">
+                        {mentee.experience?.map((exp, index) => (
+                          <li key={index}>{exp}</li>
+                        ))}
+                      </ul>
+                    </p> */}
+                    {/* <p className="text-sm flex items-center gap-2">
+                      <button className="flex items-center gap-2 bg-green-600 text-white font-bold py-1 px-3 rounded-full shadow-md">
+                        <FaWallet className="h-[20px]" />
+                        {mentee.charges ? `$${mentee.charges} / hour` : "N/A"}
+                      </button>
+                    </p> */}
+
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {mentee.skills?.slice(0, 3).map((skill, index) => (
+                        <span
+                          key={index}
+                          className="text-xs bg-blue-100 text-blue-700 px-3 py-1 rounded-md"
+                        >
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <button onClick={() => handleChatClick(mentee._id)} className="mt-auto bg-yellow-500 text-white font-bold shadow-lg py-2 px-4 rounded-lg w-full hover:bg-yellow-600 transition">
+                  Chat Now
+                </button>
+              </div>
+            ))
+          ) : (
+            <p className="text-center text-gray-500 col-span-full">
+              No mentees found. Try a different search term.
+            </p>
+          )}
+        </section>
+      )}
     </div>
   );
 };

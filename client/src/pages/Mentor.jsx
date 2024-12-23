@@ -73,14 +73,14 @@ const Mentor = () => {
 
       {/* Skills Filter */}
       <div className="flex flex-wrap justify-center gap-4 mb-8">
-        {["All", "Cricket", "Football", "AI/ML", "Coding", "Data Analyst", "Web Development"].map(
+        {["Cricket", "Football", "AI/ML", "Coding", "Data Analyst", "Web Development"].map(
           (skill) => (
             <button
               key={skill}
               onClick={() => handleSkillFilter(skill)}
               className={`${selectedSkills.includes(skill)
-                  ? "bg-blue-500 text-white"
-                  : "bg-[#F0EAEB] text-gray-700"
+                ? "bg-blue-500 text-white"
+                : "bg-[#F0EAEB] text-gray-700"
                 } border border-gray-300 p-2 px-4 rounded-lg cursor-pointer transition-all duration-300`}
             >
               {skill}
@@ -91,7 +91,9 @@ const Mentor = () => {
 
       {/* Mentor Cards */}
       {loader ? (
-        <p className="text-center text-gray-500">Loading mentors...</p>
+        <div className="flex justify-center items-center h-[70vh]">
+          <div className="w-48 h-48 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
       ) : (
         <section className="grid grid-cols-1 md:grid-cols-2 gap-8 px-8">
           {mentors.length > 0 ? (
@@ -148,7 +150,7 @@ const Mentor = () => {
                   </div>
                 </div>
 
-                <button onClick={() => handleChatClick(mentor._id)} className="mt-auto bg-yellow-500 text-white font-bold shadow-lg py-2 px-4 rounded-lg w-full hover:bg-green-600 transition">
+                <button onClick={() => handleChatClick(mentor._id)} className="mt-auto bg-yellow-500 text-white font-bold shadow-lg py-2 px-4 rounded-lg w-full hover:bg-yellow-600 transition">
                   Chat Now
                 </button>
               </div>
