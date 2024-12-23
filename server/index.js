@@ -108,83 +108,78 @@ const getUsers = async (model, query, resp) => {
 };
 
 // Register API
-app.post('/register', async (req, res) => {
+router.post('/register', async (req, res) => {
     try {
-        const { type, name, email, mobile, password, skills, experience, availability, charges } = req.body;
-
-        // Check if the file is uploaded and is an image
-        if (!req.files || !req.files.photo) {
-            return res.status(400).json({ error: "No photo uploaded" });
-        }
-
-        const photo = req.files.photo;
-
-        // Validate file type (check if it's an image)
-        const validImageTypes = ['image/jpeg', 'image/png', 'image/gif'];
-        if (!validImageTypes.includes(photo.mimetype)) {
-            return res.status(400).json({ error: "Uploaded file is not a valid image" });
-        }
-
-        // Validate required fields
-        if (!type || !name || !email || !mobile || !password || !Array.isArray(skills) || skills.length === 0) {
-            return res.status(400).json({
-                error: `All fields are required, including photo ${Array.isArray(skills)}, ${skills.length}, ${skills}`,
-                missingFields: { type, name, email, mobile, password, skills },
-            });
-        }
-
-        // Parse skills and experience if they are sent as JSON strings
-        const parsedSkills = JSON.parse(skills || '[]');
-        const parsedExperience = type === 'mentor' ? JSON.parse(experience || '[]') : [];
-
-        // Check if skills array is empty
-        if (parsedSkills.length === 0) {
-            return res.status(400).json({ error: 'At least one skill is required' });
-        }
-
-        // Check if the email or mobile is already taken
-        const existingUser = await Mentor.findOne({ email }) || await Mentee.findOne({ email }) ||
-            await Mentor.findOne({ mobile }) || await Mentee.findOne({ mobile });
-        if (existingUser) {
-            return res.status(400).json({ error: 'Email or Mobile is already registered' });
-        }
-
-        // Determine user type
-        const UserModel = type === 'mentor' ? Mentor : type === 'mentee' ? Mentee : null;
-        if (!UserModel) {
-            return res.status(400).json({ error: 'Invalid user type' });
-        }
-
-        // Upload photo to Cloudinary
-        const uploadResult = await cloudinary.uploader.upload(photo.tempFilePath);
-
-        // Hash password
-        const hashedPassword = await hash(password, 9);
-
-        // Create and save user
-        const user = new UserModel({
-            name,
-            email,
-            mobile,
-            password: hashedPassword,
-            skills: parsedSkills,
-            type,
-            ...(type === 'mentor' && { experience: parsedExperience, availability, charges }), // Include mentor-specific fields
-            photo: uploadResult.secure_url, // Use secure URL from Cloudinary
-        });
-
-        const savedUser = await user.save();
-
-        // Generate JWT token
-        const token = jwt.sign({ id: savedUser._id, type }, jwtKey, { expiresIn: '26h' });
-
-        res.status(201).json({ user: savedUser, auth: token });
+      const { type, name, email, mobile, password, skills, experience, availability, charges } = req.body;
+  
+      // Validate required fields
+      if (!type || !name || !email || !mobile || !password || !skills) {
+        return res.status(400).json({ error: 'All fields are required, including at least one skill.' });
+      }
+  
+      // Parse skills and experience
+      const parsedSkills = JSON.parse(skills || '[]');
+      const parsedExperience = type === 'mentor' ? JSON.parse(experience || '[]') : [];
+  
+      // Check if skills array is empty
+      if (parsedSkills.length === 0) {
+        return res.status(400).json({ error: 'At least one skill is required.' });
+      }
+  
+      // Check if the email or mobile is already registered
+      const existingUser = await Mentor.findOne({ email }) || await Mentee.findOne({ email }) ||
+        await Mentor.findOne({ mobile }) || await Mentee.findOne({ mobile });
+  
+      if (existingUser) {
+        return res.status(400).json({ error: 'Email or Mobile is already registered.' });
+      }
+  
+      // Validate user type
+      const UserModel = type === 'mentor' ? Mentor : type === 'mentee' ? Mentee : null;
+      if (!UserModel) {
+        return res.status(400).json({ error: 'Invalid user type.' });
+      }
+  
+      // Validate and upload photo
+      if (!req.files || !req.files.photo) {
+        return res.status(400).json({ error: 'Photo is required.' });
+      }
+  
+      const photo = req.files.photo;
+      const validImageTypes = ['image/jpeg', 'image/png', 'image/gif'];
+      if (!validImageTypes.includes(photo.mimetype)) {
+        return res.status(400).json({ error: 'Uploaded file is not a valid image.' });
+      }
+  
+      // Upload photo to Cloudinary
+      const uploadResult = await cloudinary.uploader.upload(photo.tempFilePath);
+  
+      // Hash password
+      const hashedPassword = await hash(password, 9);
+  
+      // Create and save user
+      const user = new UserModel({
+        name,
+        email,
+        mobile,
+        password: hashedPassword,
+        skills: parsedSkills,
+        type,
+        ...(type === 'mentor' && { experience: parsedExperience, availability, charges }), // Include mentor-specific fields
+        photo: uploadResult.secure_url, // Use secure URL from Cloudinary
+      });
+  
+      const savedUser = await user.save();
+  
+      // Generate JWT token
+      const token = jwt.sign({ id: savedUser._id, type }, jwtKey, { expiresIn: '26h' });
+  
+      res.status(201).json({ user: savedUser, auth: token });
     } catch (error) {
-        console.error('Error during registration:', error);
-        res.status(500).json({ error: 'Internal server error', details: error.message });
+      console.error('Error during registration:', error);
+      res.status(500).json({ error: 'Internal server error', details: error.message });
     }
-});
-
+  });
 
 // Login API
 app.post('/login', async (req, res) => {

@@ -45,7 +45,7 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true); // Start the loader
-
+  
     // Validate required fields
     if (!photo || !name || !email || !mobile || !password || !skills.length) {
       setLoading(false); // Stop the loader
@@ -58,43 +58,34 @@ const Register = () => {
       });
       return;
     }
-
-    // Prepare form data
-    const formData = new FormData();
-    formData.append('type', role);
-    formData.append('name', name);
-    formData.append('email', email);
-    formData.append('mobile', mobile);
-    formData.append('password', password);
-    formData.append('photo', photo);
-
-    // Append non-empty skills
-    skills.filter(skill => skill.trim() !== "").forEach((skill, index) => {
-      formData.append(`skills[${index}]`, skill);
-    });
-
-    if (role === 'mentor') {
-      // Append non-empty experiences
-      experience.filter(exp => exp.trim() !== "").forEach((exp, index) => {
-        formData.append(`experience[${index}]`, exp);
-      });
-      formData.append('availability', availability || '');
-      formData.append('charges', charges || 0);
-    }
-
-    formData.forEach((value, key) => {
-      console.log(`${key}: ${value}`);
-    });
-    
+  
     try {
+      // Prepare FormData for file upload
+      const formData = new FormData();
+      formData.append('type', role);
+      formData.append('name', name);
+      formData.append('email', email);
+      formData.append('mobile', mobile);
+      formData.append('password', password);
+      formData.append('photo', photo); // Append the file
+      formData.append('skills', JSON.stringify(skills.filter(skill => skill.trim() !== "")));
+  
+      if (role === 'mentor') {
+        formData.append('experience', JSON.stringify(experience.filter(exp => exp.trim() !== "")));
+        formData.append('availability', availability || '');
+        formData.append('charges', charges || 0);
+      }
+  
+      console.log('FormData:', formData);
+  
       const response = await fetch('https://mentormatch-ewws.onrender.com/register', {
         method: 'POST',
-        body: formData,
+        body: formData, // Use FormData as the body
       });
-
+  
       const result = await response.json();
       setLoading(false); // Stop the loader
-
+  
       if (response.ok) {
         toast.success('Registration successful!', {
           position: "top-center",
@@ -124,10 +115,6 @@ const Register = () => {
       });
     }
   };
-
-
-
-
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-blue-600 via-pink-400 to-red-500 flex items-center justify-center p-6">
