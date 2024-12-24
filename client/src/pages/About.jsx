@@ -12,7 +12,7 @@ const About = () => {
     }, []);
 
     return (
-        <div className="mb-40 font-poppins">
+        <div className="pb-40 font-poppins bg-gray-800">
             {/* Intro Section */}
             <div
                 className="relative min-h-[130vh] flex flex-col justify-between gap-12 px-16 py-12 text-white bg-cover bg-center before:absolute before:inset-0 before:bg-black/50"
@@ -41,28 +41,28 @@ const About = () => {
             </div>
 
             {/* About Us Section */}
-            <div className="text-4xl font-semibold text-center py-12">About Us</div>
+            <div className="text-4xl font-semibold text-white text-center py-12">About Us</div>
 
             <div className="mx-12 lg:mx-48 mt-12 flex flex-col gap-12">
-            <div className="text-3xl font-medium">
-    Connecting mentors and mentees for a <span className="text-red-500">brighter future</span>
-</div>
+                <div className="text-3xl text-white font-medium">
+                    Connecting mentors and mentees for a <span className="text-red-500">brighter future</span>
+                </div>
 
-                <p className="text-lg leading-relaxed">
+                <p className="text-lg  text-white leading-relaxed">
                     At MentorMatch, we believe in the power of mentorship to drive personal
                     and professional growth. Our platform connects mentors and mentees
                     based on shared interests, skills, and goals, fostering meaningful
                     relationships that help individuals thrive in their careers and life
                     journeys.
                 </p>
-                <p className="text-lg leading-relaxed">
+                <p className="text-lg  text-white leading-relaxed">
                     Whether you are a student looking for career guidance, a professional
                     seeking mentorship in a new field, or an expert willing to share your
                     knowledge, MentorMatch is the platform for you. We ensure seamless
                     connections, making mentorship accessible, valuable, and impactful for
                     everyone involved.
                 </p>
-                <p className="text-lg leading-relaxed">
+                <p className="text-lg  text-white leading-relaxed">
                     Our mission is to create a world where mentorship is not a privilege
                     but a resource accessible to all. By providing tools to connect and
                     communicate effectively, we aim to break barriers, bridge knowledge
@@ -71,7 +71,7 @@ const About = () => {
             </div>
 
             {/* Who Are We Section */}
-            <div className="mt-32 mx-12 lg:mx-48">
+            <div className="mt-32 mx-12 text-white lg:mx-48">
                 <div className="text-3xl font-semibold mb-8">
                     Who Are We?
                 </div>

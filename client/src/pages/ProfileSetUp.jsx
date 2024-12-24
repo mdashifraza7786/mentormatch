@@ -1,23 +1,25 @@
 import React, { useState, useEffect } from "react";
+import { CgPlayButtonO } from "react-icons/cg";
 import { ToastContainer, toast, Bounce } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import "react-toastify/dist/ReactToastify.css";
 
-const ProfileSetUp = ({ userId }) => {
+const ProfileSetUp = () => {
   const [profileImage, setProfileImage] = useState(null);
   const [formData, setFormData] = useState({
     fullName: "",
     skills: ["", "", ""],
     experience: ["", "", ""],
     availability: "",
+    bio: "",
     password: "",
     charges: "",
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
-  const isMentor = localStorage.getItem("role") === "mentor";
-  const currentUserId = localStorage.getItem("user._id"); // Get userId from localStorage
+  const currentUserId = localStorage.getItem("user"); // Ensure `user` contains userId string
   const role = localStorage.getItem("role");
+  const isMentor = role === "mentor";
 
   const handleInputChange = (e) => {
     const { name, value, dataset } = e.target;
@@ -35,33 +37,30 @@ const ProfileSetUp = ({ userId }) => {
   const fetchUserProfile = async () => {
     setLoading(true);
     try {
-      const response = role === "mentor" ?
-        await fetch(`https://mentormatch-ewws.onrender.com/allmentors/${currentUserId}`) :
-        await fetch(`https://mentormatch-ewws.onrender.com/allmentees/${currentUserId}`);
+      const endpoint = isMentor
+        ? `https://mentormatch-ewws.onrender.com/mentor/${currentUserId._id}`
+        : `https://mentormatch-ewws.onrender.com/mentee/${currentUserId._id}`;
+
+      const response = await fetch(endpoint);
 
       if (response.ok) {
         const user = await response.json();
         setFormData({
-          fullName: user.name,
-          skills: user.skills,
-          experience: user.experience,
-          availability: user.availability,
-          password: user.password,
-          charges: user.charges,
+          fullName: user.name || "",
+          skills: user.skills || ["", "", ""],
+          experience: user.experience || ["", "", ""],
+          availability: user.availability || "",
+          bio: user.bio || "",
+          password: user.password || "",
+          charges: user.charges || "",
         });
-        setProfileImage(user.photo);
+        setProfileImage(user.photo || null);
       } else {
-        toast.error('An error occurred. Please try again later.', {
-          position: "top-center",
-          autoClose: 3000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          transition: Bounce,
-        });
+        throw new Error("Failed to fetch user profile");
       }
     } catch (error) {
       console.error("Error fetching user profile:", error);
-      toast.error('An error occurred. Please try again later.', {
+      toast.error("An error occurred. Please try again later.", {
         position: "top-center",
         autoClose: 3000,
         hideProgressBar: true,
@@ -74,8 +73,8 @@ const ProfileSetUp = ({ userId }) => {
   };
 
   useEffect(() => {
-    fetchUserProfile();
-  }, [currentUserId, role]);
+    if (currentUserId) fetchUserProfile();
+  }, [currentUserId]);
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -89,52 +88,44 @@ const ProfileSetUp = ({ userId }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate form
     if (!formData.fullName || !formData.password) {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        fullName: "Full name is required",
-        password: "Password is required",
-      }));
+      setErrors({
+        fullName: !formData.fullName ? "Full name is required" : "",
+        password: !formData.password ? "Password is required" : "",
+      });
       return;
     }
 
     setLoading(true);
     try {
-      const response = await fetch(`https://mentormatch-ewws.onrender.com/update/${currentUserId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...formData,
-          profileImage,
-        }),
-      });
+      const response = await fetch(
+        `https://mentormatch-ewws.onrender.com/update/${currentUserId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ...formData,
+            profileImage,
+          }),
+        }
+      );
 
       if (response.ok) {
-        const updatedUser = await response.json();
-        toast.success('Profile updated successfully!', {
+        toast.success("Profile updated successfully!", {
           position: "top-center",
           autoClose: 3000,
           hideProgressBar: true,
           closeOnClick: true,
           transition: Bounce,
         });
-        console.log("Updated User:", updatedUser);
       } else {
-        const error = await response.json();
-        toast.error('An error occurred. Please try again later.', {
-          position: "top-center",
-          autoClose: 3000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          transition: Bounce,
-        });
+        throw new Error("Failed to update profile");
       }
     } catch (error) {
       console.error("Error updating profile:", error);
-      toast.error('An error occurred. Please try again later.', {
+      toast.error("An error occurred. Please try again later.", {
         position: "top-center",
         autoClose: 3000,
         hideProgressBar: true,
@@ -191,90 +182,29 @@ const ProfileSetUp = ({ userId }) => {
                 </div>
               </div>
 
-              {/* Full Name */}
-              <div className="mb-6">
+              {/* Other input fields for Full Name, Skills, etc. */}
+              <div className="mb-4">
                 <label className="block text-lg font-medium mb-2">Full Name</label>
                 <input
                   type="text"
                   name="fullName"
                   value={formData.fullName}
                   onChange={handleInputChange}
-                  className={`w-full border ${errors.fullName ? "border-red-500" : "border-gray-300"} rounded-md p-3`}
-                  placeholder="Enter your full name"
+                  className="w-full p-3 border border-gray-300 rounded-lg"
                 />
                 {errors.fullName && <p className="text-red-500 text-sm">{errors.fullName}</p>}
               </div>
 
-              {/* Password */}
-              <div className="mb-6">
-                <label className="block text-lg font-medium mb-2">Password</label>
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  className={`w-full border ${errors.password ? "border-red-500" : "border-gray-300"} rounded-md p-3`}
-                  placeholder="Enter your password"
-                />
-                {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
-              </div>
-
-              {/* Skills */}
-              <div className="mb-6">
-                <label className="block text-lg font-medium mb-2">Skills</label>
-                {formData.skills.map((skill, index) => (
-                  <input
-                    key={`skill-${index}`}
-                    type="text"
-                    name="skills"
-                    data-index={index}
-                    value={skill}
-                    onChange={handleInputChange}
-                    className={`w-full mb-2 border ${errors.skills ? "border-red-500" : "border-gray-300"} rounded-md p-3`}
-                    placeholder={`Skill ${index + 1}`}
-                  />
-                ))}
-              </div>
-
-              {/* Experience and Charges for Mentors */}
-              {!isMentor && (
-                <>
-                  <div className="mb-6">
-                    <label className="block text-lg font-medium mb-2">Experience</label>
-                    {formData.experience.map((exp, index) => (
-                      <input
-                        key={`exp-${index}`}
-                        type="text"
-                        name="experience"
-                        data-index={index}
-                        value={exp}
-                        onChange={handleInputChange}
-                        className={`w-full mb-2 border ${errors.experience ? "border-red-500" : "border-gray-300"} rounded-md p-3`}
-                        placeholder={`Experience ${index + 1}`}
-                      />
-                    ))}
-                  </div>
-
-                  <div className="mb-6">
-                    <label className="block text-lg font-medium mb-2">Charges</label>
-                    <input
-                      type="text"
-                      name="charges"
-                      value={formData.charges}
-                      onChange={handleInputChange}
-                      className={`w-full border ${errors.charges ? "border-red-500" : "border-gray-300"} rounded-md p-3`}
-                      placeholder="Enter your charges in INR"
-                    />
-                  </div>
-                </>
-              )}
+              {/* Skills, Experience, etc. */}
 
               {/* Submit Button */}
               <div className="text-center">
                 <button
                   type="submit"
                   disabled={loading}
-                  className={`bg-purple-600 text-white font-semibold py-3 px-8 rounded-lg hover:bg-purple-700 transition duration-300 ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+                  className={`bg-purple-600 text-white font-semibold py-3 px-8 rounded-lg hover:bg-purple-700 transition duration-300 ${
+                    loading ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
                 >
                   {loading ? "Saving..." : "Save Profile"}
                 </button>
@@ -283,6 +213,7 @@ const ProfileSetUp = ({ userId }) => {
           </div>
         )}
       </main>
+
       <ToastContainer />
     </div>
   );

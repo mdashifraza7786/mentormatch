@@ -52,8 +52,8 @@ const Mentor = () => {
   }, []);
 
   return (
-    <div className="py-[5vh] px-[8vw] bg-gray-200 min-h-screen">
-      <h1 className="text-3xl font-bold text-center mb-6">Find Your Mentor</h1>
+    <div className="py-[5vh] px-[8vw]  bg-gray-800  min-h-screen">
+      <h1 className="text-3xl font-bold text-center mb-6 text-white">Find Your Mentor</h1>
 
       {/* Search Bar */}
       <div className="flex justify-center mb-6">
@@ -73,7 +73,7 @@ const Mentor = () => {
 
       {/* Skills Filter */}
       <div className="flex flex-wrap justify-center gap-4 mb-8">
-        {["Cricket", "Football", "AI/ML", "Coding", "Data Analyst", "Web Development"].map(
+        {["My Interests","Cricket", "Football", "AI/ML", "Coding", "Data Analyst", "Web Development"].map(
           (skill) => (
             <button
               key={skill}
@@ -100,7 +100,7 @@ const Mentor = () => {
             mentors.map((mentor) => (
               <div
                 key={mentor._id}
-                className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition flex flex-col"
+                className="bg-gray-700 text-white p-4 rounded-lg shadow-md hover:shadow-lg transition flex flex-col"
               >
                 <div className="flex flex-col md:flex-row items-start md:items-center gap-6 m-4">
                   <img
@@ -109,20 +109,25 @@ const Mentor = () => {
                     className="w-52 h-52 rounded-md object-cover shadow-md"
                   />
                   <div className="flex flex-col gap-4">
-                    <h2 className="text-2xl font-bold text-gray-800">{mentor.name}</h2>
+                    <h2 className="text-2xl font-bold text-[#3674c9]">{mentor.name}</h2>
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-                      <p className="text-sm text-gray-600 flex items-center gap-2">
-                        <FaEnvelope className="text-gray-500" /> {mentor.email || "N/A"}
+                      <p className="text-sm text-white flex items-center gap-2">
+                        <FaEnvelope className="text-white" /> {mentor.email || "N/A"}
                       </p>
-                      <p className="text-sm text-gray-600 flex items-center gap-2">
-                        <FaPhone className="text-gray-500" /> {mentor.mobile ? `+91-${mentor.mobile}` : "N/A"}
+                      <p className="text-sm text-white flex items-center gap-2">
+                        <FaPhone className="text-white" /> {mentor.mobile ? `+91-${mentor.mobile}` : "N/A"}
                       </p>
                     </div>
-                    <p className="text-sm text-gray-600">
+                    {/* bio */}
+                    <p className="text-sm text-white">
+                      <span className="font-semibold"></span> {mentor.bio}
+                    </p>
+
+                    <p className="text-sm text-white">
                       <span className="font-semibold">Availability:</span>{" "}
                       {mentor.availability || "N/A"}
                     </p>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-white">
                       <span className="font-semibold">Experience:</span>
                       <ul className="list-disc pl-5 mt-1">
                         {mentor.experience?.map((exp, index) => (

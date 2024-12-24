@@ -1,18 +1,20 @@
 import React from 'react';
 import { SiHotelsdotcom } from "react-icons/si";
+import { FaInstagram, FaTwitter, FaLinkedin, FaGithub } from "react-icons/fa";
+import { AiFillApple, AiFillAndroid } from "react-icons/ai";
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-100 px-8 py-10 shadow-lg font-poppins">
+    <footer className="bg-gray-900 px-8 py-10 shadow-lg font-poppins">
       {/* Brand Section */}
       <div className="flex items-center text-2xl font-semibold mb-8">
-        <span className="flex items-center gap-2 text-gray-800">
+        <span className="flex items-center gap-2 text-white">
           MentorMatch <SiHotelsdotcom color="#f13719" />
         </span>
       </div>
 
       {/* Footer Links */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-sm text-gray-700">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-sm text-white">
         {/* Info Section */}
         <div>
           <h3 className="font-bold text-gray-900 mb-4">Infoverse</h3>
@@ -52,32 +54,26 @@ const Footer = () => {
           <h3 className="font-bold text-gray-900 mb-4">Follow Us</h3>
           <div className="flex gap-4 mb-4">
             <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer">
-              <img src="https://cdn1.iconfinder.com/data/icons/social-media-circle-7/512/Circled_Instagram_svg-512.png" alt="Instagram" className="w-6 h-6" />
+              <FaInstagram className="w-6 h-6 text-white hover:text-gray-900" />
             </a>
             <a href="https://twitter.com/" target="_blank" rel="noopener noreferrer">
-              <img src="https://cdn2.iconfinder.com/data/icons/social-media-2421/512/Twitter-256.png" alt="Twitter" className="w-6 h-6" />
+              <FaTwitter className="w-6 h-6 text-white hover:text-gray-900" />
             </a>
             <a href="https://linkedin.com/" target="_blank" rel="noopener noreferrer">
-              <img src="https://cdn3.iconfinder.com/data/icons/picons-social/57/11-linkedin-512.png" alt="LinkedIn" className="w-6 h-6" />
+              <FaLinkedin className="w-6 h-6 text-white hover:text-gray-900" />
             </a>
             <a href="https://github.com/" target="_blank" rel="noopener noreferrer">
-              <img src="https://cdn1.iconfinder.com/data/icons/picons-social/57/github_rounded-512.png" alt="GitHub" className="w-6 h-6" />
+              <FaGithub className="w-6 h-6 text-white hover:text-gray-900" />
             </a>
           </div>
           <div className="flex gap-4">
-            <button className="cursor-pointer">
-              <img
-                src="https://b.zmtcdn.com/data/webuikit/9f0c85a5e33adb783fa0aef667075f9e1556003622.png"
-                alt="App Store"
-                className="w-32"
-              />
+            <button className="flex items-center gap-2 cursor-pointer bg-gray-800 px-4 py-2 rounded-lg hover:bg-gray-700">
+              <AiFillApple className="w-6 h-6 text-white" />
+              <span className="text-white text-sm">App Store</span>
             </button>
-            <button className="cursor-pointer">
-              <img
-                src="https://b.zmtcdn.com/data/webuikit/23e930757c3df49840c482a8638bf5c31556001144.png"
-                alt="Google Play"
-                className="w-32"
-              />
+            <button className="flex items-center gap-2 cursor-pointer bg-gray-800 px-4 py-2 rounded-lg hover:bg-gray-700">
+              <AiFillAndroid className="w-6 h-6 text-white" />
+              <span className="text-white text-sm">Google Play</span>
             </button>
           </div>
         </div>
@@ -87,10 +83,10 @@ const Footer = () => {
       <hr className="border-gray-300 my-8" />
 
       {/* Footer Bottom Text */}
-      <p className="text-xs text-gray-600 text-center">
+      <p className="text-xs text-gray-200 text-center">
         By continuing past this page, you agree to our Terms of Service, Cookie Policy, Privacy Policy, and Content Policies.
         <br />
-        All trademarks are properties of their respective owners. 2008-2024 © MyHotel™ Ltd. All rights reserved.
+        All trademarks are properties of their respective owners. 2008-2025 © MentorMatch™ Ltd. All rights reserved.
       </p>
     </footer>
   );

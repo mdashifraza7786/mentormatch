@@ -15,7 +15,9 @@ const Register = () => {
   const [availability, setAvailability] = useState('');
   const [charges, setCharges] = useState('');
   const [budget, setBudget] = useState('');
+  const [bio, setBio] = useState('');
   const [photo, setPhoto] = useState(null);
+  
   const [photoPreview, setPhotoPreview] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -67,6 +69,7 @@ const Register = () => {
       formData.append('email', email);
       formData.append('mobile', mobile);
       formData.append('password', password);
+      formData.append('bio', bio);
       formData.append('photo', photo); // Append the file
       formData.append('skills', JSON.stringify(skills.filter(skill => skill.trim() !== "")));
   
@@ -211,6 +214,17 @@ const Register = () => {
                 placeholder="Enter your 10-digit mobile number"
                 value={mobile}
                 onChange={(e) => setMobile(e.target.value)}
+                className="w-full p-3 border rounded-md focus:outline-none focus:ring focus:ring-blue-300"
+              />
+            </div>
+
+            {/* bio */}
+            <div className="mb-4">
+              <label className="block text-gray-700 font-semibold mb-2">Bio</label>
+              <textarea
+                placeholder="Tell us about yourself"
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
                 className="w-full p-3 border rounded-md focus:outline-none focus:ring focus:ring-blue-300"
               />
             </div>

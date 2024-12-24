@@ -52,8 +52,8 @@ const Mentee = () => {
   }, []);
 
   return (
-    <div className="py-[5vh] px-[8vw] bg-gray-200 min-h-screen">
-      <h1 className="text-3xl font-bold text-center mb-6">Find Your Mentees</h1>
+    <div className="py-[5vh] px-[8vw] bg-gray-800 min-h-screen">
+      <h1 className="text-3xl font-bold text-center mb-6 text-white">Find Your Mentees</h1>
 
       {/* Search Bar */}
       <div className="flex justify-center mb-6">
@@ -73,7 +73,7 @@ const Mentee = () => {
 
       {/* Skills Filter */}
       <div className="flex flex-wrap justify-center gap-4 mb-8">
-        {["Cricket", "Football", "AI/ML", "Coding", "Data Analyst", "Web Development"].map(
+        {["My Interests","Cricket", "Football", "AI/ML", "Coding", "Data Analyst", "Web Development"].map(
           (skill) => (
             <button
               key={skill}
@@ -100,7 +100,7 @@ const Mentee = () => {
             mentees.map((mentee) => (
               <div
                 key={mentee._id}
-                className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition flex flex-col"
+                className="bg-gray-700 text-white p-4 rounded-lg shadow-md hover:shadow-lg transition flex flex-col"
               >
                 <div className="flex flex-col md:flex-row items-start md:items-center gap-6 m-4">
                   <img
@@ -109,19 +109,23 @@ const Mentee = () => {
                     className="w-52 h-52 rounded-md object-cover shadow-md"
                   />
                   <div className="flex flex-col gap-4">
-                    <h2 className="text-2xl font-bold text-gray-800">{mentee.name}</h2>
+                    <h2 className="text-2xl font-bold text-[#3674c9]">{mentee.name}</h2>
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-                      <p className="text-sm text-gray-600 flex items-center gap-2">
-                        <FaEnvelope className="text-gray-500" /> {mentee.email || "N/A"}
+                      <p className="text-sm text-white flex items-center gap-2">
+                        <FaEnvelope className="text-white" /> {mentee.email}
                       </p>
-                      <p className="text-sm text-gray-600 flex items-center gap-2">
-                        <FaPhone className="text-gray-500" /> {mentee.mobile ? `+91-${mentee.mobile}` : "N/A"}
+                      <p className="text-sm text-white flex items-center gap-2">
+                        <FaPhone className="text-white" /> {mentee.mobile ? `+91-${mentee.mobile}` : ""}
                       </p>
                     </div>
-                    <p className="text-sm text-gray-600">
+                    {/* bio */}
+                    <p className="text-sm text-white">
+                      <span className="font-semibold"><span className="font-bold text-blue-600"></span></span> {mentee.bio}
+                    </p>
+                    {/* <p className="text-sm text-white">
                       <span className="font-semibold">Availability:</span>{" "}
                       {mentee.availability || "N/A"}
-                    </p>
+                    </p> */}
                     {/* <p className="text-sm text-gray-600">
                       <span className="font-semibold">Experience:</span>
                       <ul className="list-disc pl-5 mt-1">
