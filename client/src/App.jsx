@@ -23,7 +23,7 @@ function App() {
     <BrowserRouter>
       <div className="App">
         {/* Navbar */}
-        <Navbar />
+        {/* <Navbar /> */}
 
         {/* Routes */}
         <Routes>

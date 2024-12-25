@@ -110,7 +110,7 @@ const getUsers = async (model, query, resp) => {
 // Register API
 router.post('/register', async (req, res) => {
     try {
-      const { type, name, email, mobile, password, skills, experience, availability, charges } = req.body;
+      const { type, name, email, mobile, password, skills, experience, availability, charges,bio } = req.body;
   
       // Validate required fields
       if (!type || !name || !email || !mobile || !password || !skills) {
@@ -162,6 +162,7 @@ router.post('/register', async (req, res) => {
         name,
         email,
         mobile,
+        bio,
         password: hashedPassword,
         skills: parsedSkills,
         type,

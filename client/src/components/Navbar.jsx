@@ -15,9 +15,20 @@ const Navbar = () => {
 
   // Check login state using localStorage or cookies
   useEffect(() => {
-    const token = localStorage.getItem("auth") || document.cookie.includes("auth");
+    const token = localStorage.getItem("user") || document.cookie.includes("auth");
     setIsLoggedIn(!!token);
   }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("auth");
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    localStorage.clear();
+    document.cookie = "auth=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    setIsLoggedIn(false);
+    window.location.reload();
+    window.location.href = "/";
+  };
 
   const toggleNotifications = () => {
     setIsOpen(!isOpen);
@@ -32,7 +43,7 @@ const Navbar = () => {
         </div>
 
         {/* Desktop Navigation Links */}
-        <div className="hidden md:flex gap-6">
+        <div className="hidden md:flex gap-10">
           <Link to="/about" className="text-white hover:text-blue-600">
             About
           </Link>
@@ -42,9 +53,7 @@ const Navbar = () => {
           <Link to="/mentees" className="text-white hover:text-blue-600">
             Mentees
           </Link>
-          <Link to="/contact" className="text-white hover:text-blue-600">
-            Contact
-          </Link>
+          
         </div>
 
         {/* User Options */}
@@ -80,11 +89,7 @@ const Navbar = () => {
                 <CgProfile className="text-2xl text-blue-700 hover:text-blue-500 cursor-pointer" />
               </Link>
               <CiLogout
-                onClick={() => {
-                  localStorage.removeItem("authToken");
-                  document.cookie = "authToken=; Max-Age=0; path=/;";
-                  setIsLoggedIn(false);
-                }}
+                onClick={handleLogout}
                 className="text-2xl text-red-600 hover:text-red-800 cursor-pointer"
               />
             </>

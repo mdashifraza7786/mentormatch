@@ -2,8 +2,11 @@ import React from 'react';
 import { SiHotelsdotcom } from "react-icons/si";
 import { FaInstagram, FaTwitter, FaLinkedin, FaGithub } from "react-icons/fa";
 import { AiFillApple, AiFillAndroid } from "react-icons/ai";
+import { useNavigate } from 'react-router-dom'; // Add this if using react-router-dom
 
 const Footer = () => {
+  const navigate = useNavigate(); // Use navigation hook if needed
+
   return (
     <footer className="bg-gray-900 px-8 py-10 shadow-lg font-poppins">
       {/* Brand Section */}
@@ -17,53 +20,59 @@ const Footer = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-sm text-white">
         {/* Info Section */}
         <div>
-          <h3 className="font-bold text-gray-900 mb-4">Infoverse</h3>
+          <h3 className="font-bold text-gray-200 mb-4">Infoverse</h3>
           <ul className="space-y-2">
-            <li className="hover:text-gray-900 cursor-pointer">About Us</li>
-            <li className="hover:text-gray-900 cursor-pointer">Careers</li>
-            <li className="hover:text-gray-900 cursor-pointer">Blog</li>
-            <li className="hover:text-gray-900 cursor-pointer">Contact Us</li>
-            <li className="hover:text-gray-900 cursor-pointer">FAQ</li>
-            <li className="hover:text-gray-900 cursor-pointer">Help Center</li>
+            <li onClick={() => navigate('/about')} className="hover:text-gray-300 cursor-pointer">
+              About Us
+            </li>
+            <li className="hover:text-gray-300 cursor-pointer">Careers</li>
+            <li className="hover:text-gray-300 cursor-pointer">Blog</li>
+            <li>
+              <a href="mailto:zeeshansayeedindia@gmail.com" className="hover:text-gray-300">
+                Contact Us
+              </a>
+            </li>
+            <li className="hover:text-gray-300 cursor-pointer">FAQ</li>
+            <li className="hover:text-gray-300 cursor-pointer">Help Center</li>
           </ul>
         </div>
 
         {/* Partner Section */}
         <div>
-          <h3 className="font-bold text-gray-900 mb-4">Partner</h3>
+          <h3 className="font-bold text-gray-200 mb-4">Partner</h3>
           <ul className="space-y-2">
-            <li className="hover:text-gray-900 cursor-pointer">Become a Partner</li>
-            <li className="hover:text-gray-900 cursor-pointer">Partner Login</li>
-            <li className="hover:text-gray-900 cursor-pointer">Partner Portal</li>
-            <li className="hover:text-gray-900 cursor-pointer">Partner Programs</li>
+            <li className="hover:text-gray-300 cursor-pointer">Become a Partner</li>
+            <li className="hover:text-gray-300 cursor-pointer">Partner Login</li>
+            <li className="hover:text-gray-300 cursor-pointer">Partner Portal</li>
+            <li className="hover:text-gray-300 cursor-pointer">Partner Programs</li>
           </ul>
         </div>
 
         {/* Learn Section */}
         <div>
-          <h3 className="font-bold text-gray-900 mb-4">Learn</h3>
+          <h3 className="font-bold text-gray-200 mb-4">Learn</h3>
           <ul className="space-y-2">
-            <li className="hover:text-gray-900 cursor-pointer">Courses</li>
-            <li className="hover:text-gray-900 cursor-pointer">Tutorials</li>
-            <li className="hover:text-gray-900 cursor-pointer">Community</li>
+            <li className="hover:text-gray-300 cursor-pointer">Courses</li>
+            <li className="hover:text-gray-300 cursor-pointer">Tutorials</li>
+            <li className="hover:text-gray-300 cursor-pointer">Community</li>
           </ul>
         </div>
 
         {/* Social Links Section */}
         <div>
-          <h3 className="font-bold text-gray-900 mb-4">Follow Us</h3>
+          <h3 className="font-bold text-gray-200 mb-4">Follow Us</h3>
           <div className="flex gap-4 mb-4">
             <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer">
-              <FaInstagram className="w-6 h-6 text-white hover:text-gray-900" />
+              <FaInstagram className="w-6 h-6 text-white hover:text-gray-300" />
             </a>
             <a href="https://twitter.com/" target="_blank" rel="noopener noreferrer">
-              <FaTwitter className="w-6 h-6 text-white hover:text-gray-900" />
+              <FaTwitter className="w-6 h-6 text-white hover:text-gray-300" />
             </a>
             <a href="https://linkedin.com/" target="_blank" rel="noopener noreferrer">
-              <FaLinkedin className="w-6 h-6 text-white hover:text-gray-900" />
+              <FaLinkedin className="w-6 h-6 text-white hover:text-gray-300" />
             </a>
             <a href="https://github.com/" target="_blank" rel="noopener noreferrer">
-              <FaGithub className="w-6 h-6 text-white hover:text-gray-900" />
+              <FaGithub className="w-6 h-6 text-white hover:text-gray-300" />
             </a>
           </div>
           <div className="flex gap-4">

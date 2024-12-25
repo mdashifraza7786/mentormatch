@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ToastContainer, toast, Bounce } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { RingLoader } from 'react-spinners';
-import { Link } from 'react-router-dom';
+import { Link , Navigate} from 'react-router-dom';
 
 const Register = () => {
   const [role, setRole] = useState('');
@@ -20,6 +20,8 @@ const Register = () => {
   
   const [photoPreview, setPhotoPreview] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const navigate = Navigate();
 
   const handleRoleChange = (e) => setRole(e.target.value);
 
@@ -97,6 +99,7 @@ const Register = () => {
           closeOnClick: true,
           transition: Bounce,
         });
+        navigate('/login');
       } else {
         toast.error(`Registration failed: ${result.error || 'Unknown error'}`, {
           position: "top-center",
