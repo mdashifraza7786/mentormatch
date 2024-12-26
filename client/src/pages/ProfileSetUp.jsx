@@ -3,6 +3,7 @@ import { CgPlayButtonO } from "react-icons/cg";
 import { ToastContainer, toast, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Navbar from "../components/Navbar";
+import { useNavigate } from "react-router-dom";
 
 const ProfileSetUp = () => {
   const [profileImage, setProfileImage] = useState(null);
@@ -17,6 +18,8 @@ const ProfileSetUp = () => {
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value, dataset } = e.target;
@@ -140,6 +143,58 @@ const ProfileSetUp = () => {
     }
   };
 
+  const handleDelete = async () => {
+    const currentUserId = JSON.parse(localStorage.getItem("user"))?._id;
+
+    if (!currentUserId) {
+      toast.error("User ID not found.", {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        transition: Bounce,
+      });
+      return;
+    }
+
+    if (!window.confirm("Are you sure you want to delete your profile? This action cannot be undone.")) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`https://mentormatch-ewws.onrender.com/user/${currentUserId}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        toast.success("Profile deleted successfully.", {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          transition: Bounce,
+        });
+
+        localStorage.clear(); // Clear local storage
+        window.location.reload(); // Reload the page
+        navigate('/'); // Redirect to home page
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to delete profile");
+      }
+    } catch (error) {
+      console.error("Error deleting profile:", error);
+      toast.error("An error occurred. Please try again later.", {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        transition: Bounce,
+      });
+    }
+  };
+
+
   return (
     <div>
       <Navbar />
@@ -190,50 +245,42 @@ const ProfileSetUp = () => {
                   />
                   {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
                 </div>
-                <div className="mb-4">
-                  <label className="block text-lg font-medium mb-2">Skills</label>
-                  {formData.skills.map((skill, index) => (
-                    <input
-                      key={index}
-                      type="text"
-                      name="skills"
-                      value={skill}
-                      onChange={handleInputChange}
-                      className="w-full p-3 border border-gray-300 rounded-lg"
-                      data-index={index}
-                    />
-                  ))}
-                </div>
 
-                {isMentor && (
-                  <div>
-                    <div className="mb-4">
-                      <label className="block text-lg font-medium mb-2">Experience</label>
-                      {formData.experience.map((exp, index) => (
-                        <input
-                          key={index}
-                          type="text"
-                          name="experience"
-                          value={exp}
-                          onChange={handleInputChange}
-                          className="w-full p-3 border border-gray-300 rounded-lg"
-                          data-index={index}
-                        />
-                      ))}
-                    </div>
 
-                    <div className="mb-4">
-                      <label className="block text-lg font-medium mb-2">Availability</label>
+                {/* {isMentor && ( */}
+                <div>
+                  <div className="mb-4">
+                    <label className="block text-lg font-medium mb-2">Skills</label>
+                    {[0, 1, 2].map((index) => (
                       <input
+                        key={index}
                         type="text"
-                        name="availability"
-                        value={formData.availability}
+                        name="skills"
+                        value={formData.skills[index] || ""}
                         onChange={handleInputChange}
-                        className="w-full p-3 border border-gray-300 rounded-lg"
+                        className="w-full p-3 border border-gray-300 rounded-lg mb-2"
+                        data-index={index}
                       />
-                    </div>
+                    ))}
                   </div>
-                )}
+
+                  <div className="mb-4">
+                    <label className="block text-lg font-medium mb-2">Experience</label>
+                    {[0, 1, 2].map((index) => (
+                      <input
+                        key={index}
+                        type="text"
+                        name="experience"
+                        value={formData.experience[index] || ""}
+                        onChange={handleInputChange}
+                        className="w-full p-3 border border-gray-300 rounded-lg mb-2"
+                        data-index={index}
+                      />
+                    ))}
+                  </div>
+
+                </div>
+                {/* )} */}
 
                 <div className="mb-4">
                   <label className="block text-lg font-medium mb-2">Bio</label>
@@ -246,19 +293,7 @@ const ProfileSetUp = () => {
                 </div>
 
                 <div className="mb-4">
-                  <label className="block text-lg font-medium mb-2">Password</label>
-                  <input
-                    type="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    className="w-full p-3 border border-gray-300 rounded-lg"
-                  />
-                  {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
-                </div>
-
-                <div className="mb-4">
-                  <label className="block text-lg font-medium mb-2">Charges</label>
+                  <label className="block text-lg font-medium mb-2">Charges (in INR)</label>
                   <input
                     type="text"
                     name="charges"
@@ -269,15 +304,23 @@ const ProfileSetUp = () => {
                 </div>
 
 
-                <div className="text-center">
+                <div className="text-center flex items-center justify-center gap-4">
                   <button
                     type="submit"
                     disabled={loading}
                     className={`bg-purple-600 text-white font-semibold py-3 px-8 rounded-lg hover:bg-purple-700 transition duration-300 ${loading ? "opacity-50 cursor-not-allowed" : ""
-                      }`}
+                      } sm:py-3 sm:px-8 sm:text-base py-2 px-6 text-sm`}
                   >
-                    {loading ? "Saving..." : "Save Profile"}
+                    {loading ? "Saving..." : "UPDATE PROFILE"}
                   </button>
+                  <button
+                    onClick={handleDelete}
+                    className="bg-red-600 text-white font-semibold py-3 px-8 rounded-lg hover:bg-red-700 transition duration-300 sm:py-3 sm:px-8 sm:text-base py-2 px-6 text-sm"
+                  >
+                    DELETE PROFILE
+                  </button>
+
+
                 </div>
               </form>
             </div>

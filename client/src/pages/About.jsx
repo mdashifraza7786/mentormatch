@@ -18,15 +18,15 @@ const About = () => {
                 className="relative min-h-[130vh] flex flex-col justify-between gap-12 px-16 py-12 text-white bg-cover bg-center before:absolute before:inset-0 before:bg-black/50"
                 style={{ backgroundImage: `url(${mentor})` }}
             >
-                <div className="relative z-10 flex items-center gap-10 pt-8">
-                    <div className="text-2xl font-semibold font-raleway">MentorMatch</div>
+                <div className="relative z-10 flex items-center gap-10 pt-6">
+                    <div className="text-xl sm:text-2xl font-semibold font-raleway">MentorMatch</div>
                     <div
-                        className="text-xl font-light cursor-pointer hover:text-red-400"
+                        className="text-lg sm:text-xl font-light cursor-pointer hover:text-red-400"
                         onClick={() => navigate(auth ? '/' : '/home')}
                     >
                         Home
                     </div>
-                    <div className="text-xl font-light">
+                    <div className="text-lg sm:text-xl font-light">
                         <a
                             href="mailto:contact@mentormatch.com"
                             className="text-white no-underline hover:underline"

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ToastContainer, toast, Bounce } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { RingLoader } from 'react-spinners';
-import { Link , Navigate} from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 
 const Register = () => {
   const [role, setRole] = useState('');
@@ -17,7 +17,7 @@ const Register = () => {
   const [budget, setBudget] = useState('');
   const [bio, setBio] = useState('');
   const [photo, setPhoto] = useState(null);
-  
+
   const [photoPreview, setPhotoPreview] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -49,7 +49,7 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true); // Start the loader
-  
+
     // Validate required fields
     if (!photo || !name || !email || !mobile || !password || !skills.length) {
       setLoading(false); // Stop the loader
@@ -62,46 +62,71 @@ const Register = () => {
       });
       return;
     }
-  
+
     try {
-      // Prepare FormData for file upload
+      // Prepare FormData for photo upload
       const formData = new FormData();
-      formData.append('type', role);
-      formData.append('name', name);
-      formData.append('email', email);
-      formData.append('mobile', mobile);
-      formData.append('password', password);
-      formData.append('bio', bio);
       formData.append('photo', photo); // Append the file
-      formData.append('skills', JSON.stringify(skills.filter(skill => skill.trim() !== "")));
-  
-      if (role === 'mentor') {
-        formData.append('experience', JSON.stringify(experience.filter(exp => exp.trim() !== "")));
-        formData.append('availability', availability || '');
-        formData.append('charges', charges || 0);
-      }
-  
-      console.log('FormData:', formData);
-  
-      const response = await fetch('https://mentormatch-ewws.onrender.com/register', {
+
+      // Step 1: Upload the photo
+      const photoResponse = await fetch('http://localhost:5001/photo_upload', {
         method: 'POST',
-        body: formData, // Use FormData as the body
+        body: formData, // Use FormData to upload the photo
       });
-  
-      const result = await response.json();
-      setLoading(false); // Stop the loader
-  
-      if (response.ok) {
-        toast.success('Registration successful!', {
-          position: "top-center",
-          autoClose: 3000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          transition: Bounce,
+
+      const photoResult = await photoResponse.json();
+
+      if (photoResponse.ok && photoResult.photo_url) {
+        // Step 2: Prepare the registration data with photo_url
+        const registrationData = {
+          type: role,
+          name: name,
+          email: email,
+          mobile: mobile,
+          password: password,
+          bio: bio,
+          photo_url: photoResult.photo_url, // Use the photo_url from the photo upload
+          skills: skills.filter(skill => skill.trim() !== ""),
+        };
+
+        if (role === 'mentor') {
+          registrationData.experience = experience.filter(exp => exp.trim() !== "");
+          registrationData.availability = availability || '';
+          registrationData.charges = charges || 0;
+        }
+
+        // Step 3: Register the user
+        const response = await fetch('http://localhost:5001/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(registrationData), // Send JSON data for registration
         });
-        navigate('/login');
+
+        const result = await response.json();
+        setLoading(false); // Stop the loader
+
+        if (response.ok) {
+          toast.success('Registration successful!', {
+            position: "top-center",
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            transition: Bounce,
+          });
+        } else {
+          toast.error(`Registration failed: ${result.error || 'Unknown error'}`, {
+            position: "top-center",
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            transition: Bounce,
+          });
+        }
       } else {
-        toast.error(`Registration failed: ${result.error || 'Unknown error'}`, {
+        setLoading(false); // Stop the loader if photo upload fails
+        toast.error('Photo upload failed. Please try again later.', {
           position: "top-center",
           autoClose: 3000,
           hideProgressBar: true,
@@ -121,6 +146,7 @@ const Register = () => {
       });
     }
   };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-blue-600 via-pink-400 to-red-500 flex items-center justify-center p-6">
@@ -311,7 +337,7 @@ const Register = () => {
                     />
                   ))}
                 </div>
-            
+
                 {/* Budget */}
                 <div className="mb-4">
                   <label className="block text-gray-700 font-semibold mb-2">Budget (in INR)</label>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
+import PrivateComponent from './components/PrivateComponent';
 
 // Import Pages
 import Home from './pages/Home';
@@ -16,23 +17,22 @@ function App() {
   return (
     <BrowserRouter>
       <div className="App">
-        {/* Navbar */}
-        {/* <Navbar /> */}
 
         {/* Routes */}
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
-          <Route path='/mentees' element={<Mentee/>}/>
-          <Route path='/mentors' element={<Mentor/>}/>
-          <Route path="/profile" element={<ProfileSetUp />} />
+          <Route path='/mentees' element={<Mentee />} />
+          <Route path='/mentors' element={<Mentor />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/chat" element={<Chat />} />
           <Route path="/about" element={<About />} />
+
+          <Route element={<PrivateComponent />}>
+            <Route path="/profile" element={<ProfileSetUp />} />
+            <Route path="/chat" element={<Chat />} />
+          </Route>
         </Routes>
 
-        {/* Footer */}
-        {/* <Footer /> */}
       </div>
     </BrowserRouter>
   );

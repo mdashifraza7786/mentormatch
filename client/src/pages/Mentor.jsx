@@ -176,7 +176,7 @@ const Mentor = () => {
                       <p className="text-sm flex items-center gap-2">
                         <button className="flex items-center gap-2 bg-green-600 text-white font-bold py-1 px-3 rounded-full shadow-md">
                           <FaWallet className="h-[20px]" />
-                          {mentor.charges ? `$${mentor.charges} / hour` : "N/A"}
+                          {mentor.charges ? `₹${mentor.charges} / hour` : "N/A"}
                         </button>
                       </p>
                       <div className="mt-3 flex flex-wrap gap-2">

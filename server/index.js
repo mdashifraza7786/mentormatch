@@ -107,10 +107,25 @@ const getUsers = async (model, query, resp) => {
     }
 };
 
+app.post('/photo_upload', async (req,res) =>{
+    const photo = req.files.photo;
+    const validImageTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    if (!validImageTypes.includes(photo.mimetype)) {
+      return res.status(400).json({ error: 'Uploaded file is not a valid image.' });
+    }
+
+    // Upload photo to Cloudinary
+    const uploadResult = await cloudinary.uploader.upload(photo.tempFilePath);
+    res.status(201).json({ photo_url: uploadResult.secure_url });
+
+
+})
+
 // Register API
 app.post('/register', async (req, res) => {
     try {
-      const { type, name, email, mobile, password, skills, experience, availability, charges,bio} = req.body;
+      const { type, name, email, mobile, password,photo_url, skills, experience, availability, charges,bio } = req.body;
+      const photourl = req.body.photo_url;
   
       // Validate required fields
       if (!type || !name || !email || !mobile || !password || !skills) {
@@ -118,8 +133,8 @@ app.post('/register', async (req, res) => {
       }
   
       // Parse skills and experience
-      const parsedSkills = JSON.parse(skills || '[]');
-      const parsedExperience = type === 'mentor' ? JSON.parse(experience || '[]') : [];
+      const parsedSkills = Object.values(skills);
+      const parsedExperience = type === 'mentor' ? Object.values(experience) : [];
   
       // Check if skills array is empty
       if (parsedSkills.length === 0) {
@@ -140,20 +155,6 @@ app.post('/register', async (req, res) => {
         return res.status(400).json({ error: 'Invalid user type.' });
       }
   
-      // Validate and upload photo
-      if (!req.files || !req.files.photo) {
-        return res.status(400).json({ error: 'Photo is required.' });
-      }
-  
-      const photo = req.files.photo;
-      const validImageTypes = ['image/jpeg', 'image/png', 'image/gif'];
-      if (!validImageTypes.includes(photo.mimetype)) {
-        return res.status(400).json({ error: 'Uploaded file is not a valid image.' });
-      }
-  
-      // Upload photo to Cloudinary
-      const uploadResult = await cloudinary.uploader.upload(photo.tempFilePath);
-  
       // Hash password
       const hashedPassword = await hash(password, 9);
   
@@ -168,7 +169,7 @@ app.post('/register', async (req, res) => {
         role:type,
         type,
         ...(type === 'mentor' && { experience: parsedExperience, availability, charges }), // Include mentor-specific fields
-        photo: uploadResult.secure_url, // Use secure URL from Cloudinary
+        photo: photo_url, // Use secure URL from Cloudinary
       });
   
       const savedUser = await user.save();
