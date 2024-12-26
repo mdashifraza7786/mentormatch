@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ToastContainer, toast, Bounce } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { RingLoader } from 'react-spinners';
-import { Link, Navigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Register = () => {
   const [role, setRole] = useState('');
@@ -21,7 +21,7 @@ const Register = () => {
   const [photoPreview, setPhotoPreview] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const navigate = Navigate();
+  const navigate = useNavigate();
 
   const handleRoleChange = (e) => setRole(e.target.value);
 
@@ -69,7 +69,7 @@ const Register = () => {
       formData.append('photo', photo); // Append the file
 
       // Step 1: Upload the photo
-      const photoResponse = await fetch('http://localhost:5001/photo_upload', {
+      const photoResponse = await fetch('https://mentormatch-ewws.onrender.com/photo_upload', {
         method: 'POST',
         body: formData, // Use FormData to upload the photo
       });
@@ -96,7 +96,7 @@ const Register = () => {
         }
 
         // Step 3: Register the user
-        const response = await fetch('http://localhost:5001/register', {
+        const response = await fetch('https://mentormatch-ewws.onrender.com/register', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -115,6 +115,9 @@ const Register = () => {
             closeOnClick: true,
             transition: Bounce,
           });
+
+          navigate('/login');
+          localStorage.setItem('user', JSON.stringify(result.user));
         } else {
           toast.error(`Registration failed: ${result.error || 'Unknown error'}`, {
             position: "top-center",
@@ -262,7 +265,7 @@ const Register = () => {
               <>
                 {/* Skills */}
                 <div>
-                  <label className="block text-gray-700 font-semibold mb-2">Skills You Want to Teach (upto 5)</label>
+                  <label className="block text-gray-700 font-semibold mb-2">Skills You Want to Teach (upto 3)</label>
                   {skills.map((skill, index) => (
                     <input
                       key={index}
@@ -277,7 +280,7 @@ const Register = () => {
 
                 {/* Experience */}
                 <div>
-                  <label className="block text-gray-700 font-semibold mb-2">Experience (upto 5)</label>
+                  <label className="block text-gray-700 font-semibold mb-2">Experience (upto 3)</label>
                   {experience.map((exp, index) => (
                     <input
                       key={index}
