@@ -143,11 +143,11 @@ const ProfileSetUp = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     // Validate required fields
     const requiredFields = ["name", "bio", "password"];
     const missingFields = requiredFields.filter((field) => !formData[field]);
-  
+
     if (missingFields.length > 0) {
       setErrors(
         missingFields.reduce((acc, field) => {
@@ -164,7 +164,7 @@ const ProfileSetUp = () => {
       });
       return;
     }
-  
+
     if (
       isMentor &&
       (!formData.experience.some((exp) => exp) || !formData.availability || !formData.charges)
@@ -178,15 +178,15 @@ const ProfileSetUp = () => {
       });
       return;
     }
-  
+
     setLoading(true);
-  
+
     try {
       const currentUserId = JSON.parse(localStorage.getItem("user"))._id;
       const endpoint = `https://mentormatch-ewws.onrender.com/update/${currentUserId}`;
-      const isNewPhoto = profileImage && !profileImage.startsWith("http");
+      const isNewPhoto = profileImage && !profileImage.startsWith("https");
       const formDataToSend = new FormData();
-  
+
       // Include form data
       Object.keys(formData).forEach((key) => {
         if (Array.isArray(formData[key])) {
@@ -197,20 +197,32 @@ const ProfileSetUp = () => {
           formDataToSend.append(key, formData[key]);
         }
       });
-  
+
       // Include photo
       if (isNewPhoto) {
         const file = document.getElementById("profileImageInput").files[0];
-        formDataToSend.append("photo", file);
+        const photoForm = new FormData();
+        photoForm.append("photo", file);
+
+        const photoResponse = await fetch(
+          "https://mentormatch-ewws.onrender.com/photo_upload",
+          {
+            method: "POST",
+            body: photoForm,
+          }
+        );
+
+        const photoResult = await photoResponse.json();
+        formDataToSend.append("photo", photoResult.photo_url);
       } else {
-        formDataToSend.append("photo_url", profileImage);
+        formDataToSend.append("photo", profileImage);
       }
-  
+
       const response = await fetch(endpoint, {
         method: "PUT",
         body: formDataToSend,
       });
-  
+
       if (response.ok) {
         toast.success("Profile updated successfully!", {
           position: "top-center",
@@ -219,7 +231,7 @@ const ProfileSetUp = () => {
           closeOnClick: true,
           transition: Bounce,
         });
-        navigate("/dashboard");
+        navigate("/");
       } else {
         throw new Error("Failed to update profile");
       }
@@ -236,7 +248,8 @@ const ProfileSetUp = () => {
       setLoading(false);
     }
   };
-  
+
+
 
   return (
     <div>
@@ -276,37 +289,38 @@ const ProfileSetUp = () => {
                     />
                   </div>
                 </div>
-                
+
                 {/* Form Fields */}
                 <div className="mb-4">
                   <label className="block text-lg font-medium mb-2">Full Name</label>
                   <input
                     type="text"
-                    name="fullName"
+                    name="name"
                     value={formData.name}
                     onChange={handleInputChange}
                     className="w-full p-3 border border-gray-300 rounded-lg"
                   />
-                  {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
                 </div>
 
 
+
+                <div className="mb-4">
+                  <label className="block text-lg font-medium mb-2">Skills</label>
+                  {[0, 1, 2].map((index) => (
+                    <input
+                      key={index}
+                      type="text"
+                      name="skills"
+                      value={formData.skills[index] || ""}
+                      onChange={handleInputChange}
+                      className="w-full p-3 border border-gray-300 rounded-lg mb-2"
+                      data-index={index}
+                    />
+                  ))}
+                </div>
+
                 {isMentor && (
                   <div>
-                    <div className="mb-4">
-                      <label className="block text-lg font-medium mb-2">Skills</label>
-                      {[0, 1, 2].map((index) => (
-                        <input
-                          key={index}
-                          type="text"
-                          name="skills"
-                          value={formData.skills[index] || ""}
-                          onChange={handleInputChange}
-                          className="w-full p-3 border border-gray-300 rounded-lg mb-2"
-                          data-index={index}
-                        />
-                      ))}
-                    </div>
 
                     <div className="mb-4">
                       <label className="block text-lg font-medium mb-2">Experience</label>
@@ -321,6 +335,22 @@ const ProfileSetUp = () => {
                           data-index={index}
                         />
                       ))}
+                    </div>
+
+                    <div className="mb-4">
+                      <label className="block text-lg font-medium mb-2">Availability</label>
+                      <select
+                        name="availability"
+                        value={formData.availability}
+                        onChange={handleInputChange}
+                        className="w-full p-3 border border-gray-300 rounded-lg"
+                      >
+
+                        <option value="Weekdays">Weekdays</option>
+                        <option value="Weekends">Weekends</option>
+                        <option value="Evenings">Evenings</option>
+                        <option value="Flexible">Flexible</option>
+                      </select>
                     </div>
 
                   </div>
