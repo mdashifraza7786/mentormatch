@@ -1,6 +1,11 @@
 import mongoose from 'mongoose';
 
 const MenteeSchema = new mongoose.Schema({
+  role: {
+    type: String,
+    required: true,
+    default: 'mentee',
+  },
   photo: {
     type: String,
     required: true,

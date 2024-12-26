@@ -7,7 +7,7 @@ import Navbar from "../components/Navbar";
 const ProfileSetUp = () => {
   const [profileImage, setProfileImage] = useState(null);
   const [formData, setFormData] = useState({
-    fullName: "",
+    name: "",
     skills: ["", "", ""],
     experience: ["", "", ""],
     availability: "",
@@ -17,10 +17,6 @@ const ProfileSetUp = () => {
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-
-  const currentUserId = localStorage.getItem("user"); // Ensure `user` contains userId string
-  const role = localStorage.getItem("role");
-  const isMentor = role === "mentor";
 
   const handleInputChange = (e) => {
     const { name, value, dataset } = e.target;
@@ -38,27 +34,32 @@ const ProfileSetUp = () => {
   const fetchUserProfile = async () => {
     setLoading(true);
     try {
+      const currentUser = JSON.parse(localStorage.getItem("user"));
+      const currentUserId = currentUser?._id;
+      // const isMentor = currentUser?.role === "mentor";
+      const isMentor = true; // For testing purposes
+      const baseUrl = "https://mentormatch-ewws.onrender.com";
       const endpoint = isMentor
-        ? `https://mentormatch-ewws.onrender.com/mentor/${currentUserId._id}`
-        : `https://mentormatch-ewws.onrender.com/mentee/${currentUserId._id}`;
+        ? `${baseUrl}/mentor?id=${currentUserId}`
+        : `${baseUrl}/mentee?id=${currentUserId}`;
 
       const response = await fetch(endpoint);
-
-      if (response.ok) {
-        const user = await response.json();
-        setFormData({
-          fullName: user.name || "",
-          skills: user.skills || ["", "", ""],
-          experience: user.experience || ["", "", ""],
-          availability: user.availability || "",
-          bio: user.bio || "",
-          password: user.password || "",
-          charges: user.charges || "",
-        });
-        setProfileImage(user.photo || null);
-      } else {
+      if (!response.ok) {
         throw new Error("Failed to fetch user profile");
       }
+
+      const user = await response.json();
+      setFormData({
+        name: user[0].name || "",
+        skills: user[0].skills || ["", "", ""],
+        experience: user[0].experience || ["", "", ""],
+        availability: user[0].availability || "",
+        bio: user[0].bio || "",
+        password: user[0].password || "",
+        charges: user[0].charges || "",
+      });
+      setProfileImage(user[0].photo || null);
+      console.log("User profile fetched:", user);
     } catch (error) {
       console.error("Error fetching user profile:", error);
       toast.error("An error occurred. Please try again later.", {
@@ -74,8 +75,8 @@ const ProfileSetUp = () => {
   };
 
   useEffect(() => {
-    if (currentUserId) fetchUserProfile();
-  }, [currentUserId]);
+    fetchUserProfile();
+  }, []);
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -99,6 +100,7 @@ const ProfileSetUp = () => {
 
     setLoading(true);
     try {
+      const currentUserId = JSON.parse(localStorage.getItem("user"))._id;
       const response = await fetch(
         `https://mentormatch-ewws.onrender.com/update/${currentUserId}`,
         {
@@ -142,22 +144,14 @@ const ProfileSetUp = () => {
     <div>
       <Navbar />
       <div className="min-h-screen bg-gradient-to-r from-blue-600 via-pink-400 to-red-500 font-raleway">
-        {/* <header className="bg-blue-600 text-white py-8">
-          <div className="container mx-auto text-center px-4">
-            <h1 className="text-4xl font-bold">Set Up Your Profile</h1>
-            <p className="text-lg mt-2">Help others understand your expertise and interests.</p>
-          </div>
-        </header> */}
-
         <main className="container mx-auto px-6 py-12">
           {loading ? (
             <div className="flex justify-center items-center h-[70vh]">
               <div className="w-48 h-48 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : (
-            <div className="bg-white shadow-lg rounded-lg p-8 md:p-12 max-w-3xl mx-auto">
+            <div className="bg-white shadow-lg rounded-lg p-9 md:p-12 max-w-3xl mx-auto">
               <form onSubmit={handleSubmit}>
-                {/* Profile Image Upload */}
                 <div className="mb-8 text-center">
                   <label className="block text-lg font-medium mb-2">Profile Picture</label>
                   <div className="flex flex-col items-center">
@@ -184,23 +178,97 @@ const ProfileSetUp = () => {
                     />
                   </div>
                 </div>
-
-                {/* Other input fields for Full Name, Skills, etc. */}
+                {/* Form Fields */}
                 <div className="mb-4">
                   <label className="block text-lg font-medium mb-2">Full Name</label>
                   <input
                     type="text"
                     name="fullName"
-                    value={formData.fullName}
+                    value={formData.name}
                     onChange={handleInputChange}
                     className="w-full p-3 border border-gray-300 rounded-lg"
                   />
-                  {errors.fullName && <p className="text-red-500 text-sm">{errors.fullName}</p>}
+                  {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
+                </div>
+                <div className="mb-4">
+                  <label className="block text-lg font-medium mb-2">Skills</label>
+                  {formData.skills.map((skill, index) => (
+                    <input
+                      key={index}
+                      type="text"
+                      name="skills"
+                      value={skill}
+                      onChange={handleInputChange}
+                      className="w-full p-3 border border-gray-300 rounded-lg"
+                      data-index={index}
+                    />
+                  ))}
                 </div>
 
-                {/* Skills, Experience, etc. */}
+                {isMentor && (
+                  <div>
+                    <div className="mb-4">
+                      <label className="block text-lg font-medium mb-2">Experience</label>
+                      {formData.experience.map((exp, index) => (
+                        <input
+                          key={index}
+                          type="text"
+                          name="experience"
+                          value={exp}
+                          onChange={handleInputChange}
+                          className="w-full p-3 border border-gray-300 rounded-lg"
+                          data-index={index}
+                        />
+                      ))}
+                    </div>
 
-                {/* Submit Button */}
+                    <div className="mb-4">
+                      <label className="block text-lg font-medium mb-2">Availability</label>
+                      <input
+                        type="text"
+                        name="availability"
+                        value={formData.availability}
+                        onChange={handleInputChange}
+                        className="w-full p-3 border border-gray-300 rounded-lg"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                <div className="mb-4">
+                  <label className="block text-lg font-medium mb-2">Bio</label>
+                  <textarea
+                    name="bio"
+                    value={formData.bio}
+                    onChange={handleInputChange}
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                  ></textarea>
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-lg font-medium mb-2">Password</label>
+                  <input
+                    type="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                  />
+                  {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-lg font-medium mb-2">Charges</label>
+                  <input
+                    type="text"
+                    name="charges"
+                    value={formData.charges}
+                    onChange={handleInputChange}
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                  />
+                </div>
+
+
                 <div className="text-center">
                   <button
                     type="submit"
@@ -215,7 +283,6 @@ const ProfileSetUp = () => {
             </div>
           )}
         </main>
-
         <ToastContainer />
       </div>
     </div>

@@ -1,6 +1,11 @@
 import mongoose from 'mongoose';
 
 const MentorSchema = new mongoose.Schema({
+  role: {
+    type: String,
+    required: true,
+    default: 'mentor',
+  },
   photo: {
     type: String,
     required: true,

@@ -7,7 +7,7 @@ import fileUpload from 'express-fileupload';
 import Mentor from './schema/Mentor.js';
 import Mentee from './schema/Mentee.js';
 import Chat from './schema/Chat.js';
-import Message from './schema/Message.js';
+// import Message from './schema/Message.js';
 import './db/config.js';
 import { hash, compare } from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -108,9 +108,9 @@ const getUsers = async (model, query, resp) => {
 };
 
 // Register API
-router.post('/register', async (req, res) => {
+app.post('/register', async (req, res) => {
     try {
-      const { type, name, email, mobile, password, skills, experience, availability, charges,bio } = req.body;
+      const { type, name, email, mobile, password, skills, experience, availability, charges,bio} = req.body;
   
       // Validate required fields
       if (!type || !name || !email || !mobile || !password || !skills) {
@@ -165,6 +165,7 @@ router.post('/register', async (req, res) => {
         bio,
         password: hashedPassword,
         skills: parsedSkills,
+        role:type,
         type,
         ...(type === 'mentor' && { experience: parsedExperience, availability, charges }), // Include mentor-specific fields
         photo: uploadResult.secure_url, // Use secure URL from Cloudinary
