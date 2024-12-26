@@ -291,7 +291,7 @@ app.delete('/user/:id', async (req, resp) => {
 });
 
 // Update user by ID (mentor or mentee)
-app.put('/user/:id', async (req, resp) => {
+app.put('/update/:id', async (req, resp) => {
     try {
         const { id } = req.params;
         const updatedUser = await Mentor.findByIdAndUpdate(id, req.body, { new: true }) || await Mentee.findByIdAndUpdate(id, req.body, { new: true });

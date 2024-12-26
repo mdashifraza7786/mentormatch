@@ -116,7 +116,7 @@ const Register = () => {
             transition: Bounce,
           });
 
-          navigate('/login');
+          navigate('/');
           localStorage.setItem('user', JSON.stringify(result.user));
         } else {
           toast.error(`Registration failed: ${result.error || 'Unknown error'}`, {

@@ -34,13 +34,13 @@ const ProfileSetUp = () => {
     }
   };
 
+  const currentUser = JSON.parse(localStorage.getItem("user"));
+  const currentUserId = currentUser?._id;
+  const isMentor = currentUser?.role === "mentor";
+
   const fetchUserProfile = async () => {
     setLoading(true);
     try {
-      const currentUser = JSON.parse(localStorage.getItem("user"));
-      const currentUserId = currentUser?._id;
-      // const isMentor = currentUser?.role === "mentor";
-      const isMentor = true; // For testing purposes
       const baseUrl = "https://mentormatch-ewws.onrender.com";
       const endpoint = isMentor
         ? `${baseUrl}/mentor?id=${currentUserId}`
@@ -87,59 +87,6 @@ const ProfileSetUp = () => {
       const reader = new FileReader();
       reader.onload = () => setProfileImage(reader.result);
       reader.readAsDataURL(file);
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!formData.fullName || !formData.password) {
-      setErrors({
-        fullName: !formData.fullName ? "Full name is required" : "",
-        password: !formData.password ? "Password is required" : "",
-      });
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const currentUserId = JSON.parse(localStorage.getItem("user"))._id;
-      const response = await fetch(
-        `https://mentormatch-ewws.onrender.com/update/${currentUserId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            ...formData,
-            profileImage,
-          }),
-        }
-      );
-
-      if (response.ok) {
-        toast.success("Profile updated successfully!", {
-          position: "top-center",
-          autoClose: 3000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          transition: Bounce,
-        });
-      } else {
-        throw new Error("Failed to update profile");
-      }
-    } catch (error) {
-      console.error("Error updating profile:", error);
-      toast.error("An error occurred. Please try again later.", {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        transition: Bounce,
-      });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -194,6 +141,102 @@ const ProfileSetUp = () => {
     }
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    // Validate required fields
+    const requiredFields = ["name", "bio", "password"];
+    const missingFields = requiredFields.filter((field) => !formData[field]);
+  
+    if (missingFields.length > 0) {
+      setErrors(
+        missingFields.reduce((acc, field) => {
+          acc[field] = `${field.charAt(0).toUpperCase() + field.slice(1)} is required`;
+          return acc;
+        }, {})
+      );
+      toast.error("Please fill in all required fields.", {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        transition: Bounce,
+      });
+      return;
+    }
+  
+    if (
+      isMentor &&
+      (!formData.experience.some((exp) => exp) || !formData.availability || !formData.charges)
+    ) {
+      toast.error("Mentors must provide experience, availability, and charges.", {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        transition: Bounce,
+      });
+      return;
+    }
+  
+    setLoading(true);
+  
+    try {
+      const currentUserId = JSON.parse(localStorage.getItem("user"))._id;
+      const endpoint = `https://mentormatch-ewws.onrender.com/update/${currentUserId}`;
+      const isNewPhoto = profileImage && !profileImage.startsWith("http");
+      const formDataToSend = new FormData();
+  
+      // Include form data
+      Object.keys(formData).forEach((key) => {
+        if (Array.isArray(formData[key])) {
+          formData[key].forEach((value, index) =>
+            formDataToSend.append(`${key}[${index}]`, value || "")
+          );
+        } else {
+          formDataToSend.append(key, formData[key]);
+        }
+      });
+  
+      // Include photo
+      if (isNewPhoto) {
+        const file = document.getElementById("profileImageInput").files[0];
+        formDataToSend.append("photo", file);
+      } else {
+        formDataToSend.append("photo_url", profileImage);
+      }
+  
+      const response = await fetch(endpoint, {
+        method: "PUT",
+        body: formDataToSend,
+      });
+  
+      if (response.ok) {
+        toast.success("Profile updated successfully!", {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          transition: Bounce,
+        });
+        navigate("/dashboard");
+      } else {
+        throw new Error("Failed to update profile");
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      toast.error("An error occurred. Please try again later.", {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        transition: Bounce,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+  
 
   return (
     <div>
@@ -233,6 +276,7 @@ const ProfileSetUp = () => {
                     />
                   </div>
                 </div>
+                
                 {/* Form Fields */}
                 <div className="mb-4">
                   <label className="block text-lg font-medium mb-2">Full Name</label>
@@ -247,40 +291,40 @@ const ProfileSetUp = () => {
                 </div>
 
 
-                {/* {isMentor && ( */}
-                <div>
-                  <div className="mb-4">
-                    <label className="block text-lg font-medium mb-2">Skills</label>
-                    {[0, 1, 2].map((index) => (
-                      <input
-                        key={index}
-                        type="text"
-                        name="skills"
-                        value={formData.skills[index] || ""}
-                        onChange={handleInputChange}
-                        className="w-full p-3 border border-gray-300 rounded-lg mb-2"
-                        data-index={index}
-                      />
-                    ))}
-                  </div>
+                {isMentor && (
+                  <div>
+                    <div className="mb-4">
+                      <label className="block text-lg font-medium mb-2">Skills</label>
+                      {[0, 1, 2].map((index) => (
+                        <input
+                          key={index}
+                          type="text"
+                          name="skills"
+                          value={formData.skills[index] || ""}
+                          onChange={handleInputChange}
+                          className="w-full p-3 border border-gray-300 rounded-lg mb-2"
+                          data-index={index}
+                        />
+                      ))}
+                    </div>
 
-                  <div className="mb-4">
-                    <label className="block text-lg font-medium mb-2">Experience</label>
-                    {[0, 1, 2].map((index) => (
-                      <input
-                        key={index}
-                        type="text"
-                        name="experience"
-                        value={formData.experience[index] || ""}
-                        onChange={handleInputChange}
-                        className="w-full p-3 border border-gray-300 rounded-lg mb-2"
-                        data-index={index}
-                      />
-                    ))}
-                  </div>
+                    <div className="mb-4">
+                      <label className="block text-lg font-medium mb-2">Experience</label>
+                      {[0, 1, 2].map((index) => (
+                        <input
+                          key={index}
+                          type="text"
+                          name="experience"
+                          value={formData.experience[index] || ""}
+                          onChange={handleInputChange}
+                          className="w-full p-3 border border-gray-300 rounded-lg mb-2"
+                          data-index={index}
+                        />
+                      ))}
+                    </div>
 
-                </div>
-                {/* )} */}
+                  </div>
+                )}
 
                 <div className="mb-4">
                   <label className="block text-lg font-medium mb-2">Bio</label>
@@ -308,6 +352,7 @@ const ProfileSetUp = () => {
                   <button
                     type="submit"
                     disabled={loading}
+                    // onClick={handleUpdate}
                     className={`bg-purple-600 text-white font-semibold py-3 px-8 rounded-lg hover:bg-purple-700 transition duration-300 ${loading ? "opacity-50 cursor-not-allowed" : ""
                       } sm:py-3 sm:px-8 sm:text-base py-2 px-6 text-sm`}
                   >
