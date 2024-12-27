@@ -43,18 +43,9 @@ const MenteeSchema = new mongoose.Schema({
     maxlength: 500,
     default: '',
   },
-  mentors: [
-    {
-      mentorId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Mentor',
-      },
-      connectedAt: {
-        type: Date,
-        default: Date.now,
-      },
-    },
-  ],
+  mentors: {
+    type:[string]
+  },
   mentorshipRequests: [
     {
       mentorId: {
