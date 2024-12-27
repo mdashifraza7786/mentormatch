@@ -8,6 +8,8 @@ const Mentee = () => {
   const [selectedSkills, setSelectedSkills] = useState([]);
   const [loader, setLoader] = useState(false);
 
+  const role = JSON.parse(localStorage.getItem("user"))?.role;
+
   const fetchMentees = async (query = "") => {
     setLoader(true);
     try {
@@ -134,14 +136,14 @@ const Mentee = () => {
 
         {/* Skills Filter */}
         <div className="flex flex-wrap justify-center gap-4 mb-8">
-        {["My Interests", "Cricket", "Football", "AI/ML", "Coding", "Data Analyst", "Web Development"].map(
+          {["My Interests", "Cricket", "Football", "AI/ML", "Coding", "Data Analyst", "Web Development"].map(
             (skill) => (
               <button
                 key={skill}
                 onClick={() => handleSkillFilter(skill)}
                 className={`${selectedSkills.includes(skill)
-                    ? "bg-blue-500 text-white"
-                    : "bg-[#F0EAEB] text-gray-700"
+                  ? "bg-blue-500 text-white"
+                  : "bg-[#F0EAEB] text-gray-700"
                   } border border-gray-300 p-2 px-4 rounded-lg cursor-pointer transition-all duration-300`}
               >
                 {skill}
@@ -197,11 +199,11 @@ const Mentee = () => {
                     </div>
                   </div>
 
-                  {/* {role === "mentor" && */}
-                  <button onClick={() => handleChatClick(mentee._id)} className="mt-auto bg-yellow-500 text-white font-bold shadow-lg py-2 px-4 rounded-lg w-full hover:bg-yellow-600 transition">
-                    Chat Now
-                  </button>
-                  {/* } */}
+                  {role === "mentor" &&
+                    (<button onClick={() => handleChatClick(mentee._id)} className="mt-auto bg-yellow-500 text-white font-bold shadow-lg py-2 px-4 rounded-lg w-full hover:bg-yellow-600 transition">
+                      Chat Now
+                    </button>)
+                  }
                 </div>
               ))
             ) : (

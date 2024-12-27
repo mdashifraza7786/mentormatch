@@ -9,6 +9,8 @@ const Mentor = () => {
   const [selectedSkills, setSelectedSkills] = useState([]);
   const [loader, setLoader] = useState(false);
 
+  const role = JSON.parse(localStorage.getItem("user"))?.role;
+
   const fetchMentors = async (query = "") => {
     setLoader(true);
     try {
@@ -191,12 +193,14 @@ const Mentor = () => {
                       </div>
                     </div>
                   </div>
+                  {role === "mentee" && (
                   <button
                     onClick={() => handleChatClick(mentor._id)}
                     className="mt-auto bg-yellow-500 text-white font-bold shadow-lg py-2 px-4 rounded-lg w-full hover:bg-yellow-600 transition"
                   >
                     Chat Now
                   </button>
+                  )}
                 </div>
               ))
             ) : (
