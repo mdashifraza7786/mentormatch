@@ -58,6 +58,11 @@ const Navbar = () => {
           <Link to="/mentees" className="text-white hover:text-blue-600">
             Mentees
           </Link>
+          {isLoggedIn && (
+            <Link to="/mentorship" className="text-white hover:text-blue-600">
+              Mentorship
+            </Link>
+          )}
         </div>
 
         {/* User Options for Desktop */}
@@ -142,6 +147,11 @@ const Navbar = () => {
           <Link to="/mentees" className="block py-2 text-white hover:text-blue-600">
             Mentees
           </Link>
+          {isLoggedIn && (
+            <Link to="/mentorship" className="block py-2 text-white hover:text-blue-600">
+              Mentorship
+            </Link>
+          )}
           {isLoggedIn ? (
             <>
               <div className="mt-4 border-t border-gray-700 pt-4">

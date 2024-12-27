@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
 import PrivateComponent from './components/PrivateComponent';
 
-// Import Pages
+// Importing Pages
 import Home from './pages/Home';
 import Login from './pages/Login';
 import ProfileSetUp from './pages/ProfileSetUp';
@@ -11,6 +11,7 @@ import Register from './pages/Register';
 import About from './pages/About';
 import Mentee from './pages/Mentee';
 import Mentor from './pages/Mentor';
+import Mentorship from './pages/Mentorship';
 import Chat from './pages/Chat';
 
 function App() {
@@ -18,7 +19,7 @@ function App() {
     <BrowserRouter>
       <div className="App">
 
-        {/* Routes */}
+        {/* describing Routes */}
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
@@ -27,9 +28,15 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/about" element={<About />} />
 
+          {/* using private component to protect routes, visible only after login */}
           <Route element={<PrivateComponent />}>
+            <Route path='/mentorship' element={<Mentorship />} />
             <Route path="/profile" element={<ProfileSetUp />} />
             <Route path="/chat" element={<Chat />} />
+
+            <Route path="/chat">
+              <Route path=":roomId" element={<Chat />} />
+            </Route>
           </Route>
         </Routes>
 

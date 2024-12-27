@@ -7,13 +7,12 @@ import fileUpload from 'express-fileupload';
 import Mentor from './schema/Mentor.js';
 import Mentee from './schema/Mentee.js';
 import Chat from './schema/Chat.js';
-// import Message from './schema/Message.js';
+import Message from './schema/Message.js';
 import './db/config.js';
 import { hash, compare } from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import http from 'http';
-import { Server } from 'socket.io';
-
+import { WebSocketServer } from 'ws';
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -32,69 +31,73 @@ app.use(json());
 app.use(cors({ origin: '*', methods: ['GET', 'POST', 'PUT', 'DELETE'] }));
 app.use(fileUpload({ useTempFiles: true }));
 
+// Create HTTP server and WebSocket server
 const server = http.createServer(app);
 
-const io = new Server(server, {
-    cors: {
-        origin: "*",
-        methods: ["GET", "POST"],
-    },
-});
+// WebSocket server initialization
+const wss = new WebSocketServer({ server });
 
-io.on("connection", (socket) => {
-    console.log("User connected:", socket.id);
+wss.on('connection', (ws) => {
+    console.log("WebSocket connected");
 
-    // Join a room
-    socket.on("joinRoom", async (roomId) => {
-        socket.join(roomId);
-        console.log(`User joined room: ${roomId}`);
+    // Handle incoming messages
+    ws.on('message', async (message) => {
+        const { type, roomId, senderId, text } = JSON.parse(message);
 
-        // Send chat history to the user
-        const messages = await Message.find({ chatId: roomId }).sort({ timestamp: 1 });
-        socket.emit("chatHistory", messages);
-    });
+        if (type === 'joinRoom') {
+            // Check if roomId is valid
+            if (!roomId) {
+                console.error('Invalid roomId received');
+                return;
+            }
 
-    // Handle sending messages
-    socket.on("sendMessage", async ({ roomId, senderId, text }) => {
-        try {
-            // Store the message in the database
-            const newMessage = new Message({
-                chatId: roomId,
-                senderId,
-                text,
-            });
-            await newMessage.save();
+            try {
+                ws.roomId = roomId; // Store roomId in WebSocket connection
+                console.log(`WebSocket joined room: ${roomId}`);
+                // Fetch and send chat history if roomId is valid
+                const messages = await Message.find({ chatId: roomId }).sort({ timestamp: 1 });
+                ws.send(JSON.stringify({ type: 'chatHistory', messages }));
+            } catch (error) {
+                console.error("Error joining room:", error.message);
+            }
+        }
 
-            // Update the last message in the chat
-            await Chat.findOneAndUpdate(
-                { roomId },
-                {
-                    lastMessage: {
-                        senderId,
-                        text,
-                        timestamp: new Date(),
-                    },
-                }
-            );
+        if (type === 'sendMessage') {
+            // Handle sending message logic
+            if (!roomId || !senderId || !text) {
+                console.error("Invalid message payload");
+                return;
+            }
 
-            // Broadcast the message to the room
-            const message = {
-                chatId: roomId,
-                senderId,
-                text,
-                timestamp: newMessage.timestamp,
-            };
-            io.to(roomId).emit("receiveMessage", message);
-        } catch (error) {
-            console.error("Error saving message:", error);
+            try {
+                console.log(text)
+                // Save message to database logic
+                const newMessage = new Message({
+                    chatId: roomId,
+                    senderId,
+                    text,
+                });
+                await newMessage.save();
+
+                // Broadcast message to all clients in the room
+                const messageToSend = {
+                    chatId: roomId,
+                    senderId,
+                    text,
+                    timestamp: newMessage.timestamp,
+                };
+
+                wss.clients.forEach((client) => {
+                    if (client !== ws && client.readyState === client.OPEN && client.roomId === roomId) {
+                        client.send(JSON.stringify({ type: 'receiveMessage', roomId: roomId,senderId,text,timestamp: newMessage.timestamp, }));
+                    }
+                });
+            } catch (error) {
+                console.error("Error sending message:", error.message);
+            }
         }
     });
-
-    socket.on("disconnect", () => {
-        console.log("User disconnected:", socket.id);
-    });
 });
-
 
 // Helper function for user queries
 const getUsers = async (model, query, resp) => {

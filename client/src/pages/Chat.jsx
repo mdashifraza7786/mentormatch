@@ -1,54 +1,96 @@
-import React, { useState, useEffect, useRef } from "react";
-import io from "socket.io-client";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom"; // Import useParams to get dynamic route params
 
-const Chat = ({ userId, mentorId }) => {
+const Chat = () => {
+  const { roomId } = useParams(); // Use the dynamic roomId from the URL
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const socket = useRef(null);
-  const chatEndRef = useRef(null);
+  const [socket, setSocket] = useState(null); // State for WebSocket connection
+  const chatEndRef = React.useRef(null);
+  const user = JSON.parse(localStorage.getItem('user')); // Assuming user data is stored in localStorage
+
+  // Extract senderId from user data
+  const senderId = user ? user._id : null;
 
   useEffect(() => {
-    // Connect to the Socket.IO server
-    socket.current = io("https://mentor-match-backend.onrender.com"); // Replace with your backend URL
+    if (!roomId) {
+      console.error("roomId is undefined, cannot establish connection");
+      return;
+    }
+    if (!senderId) {
+      console.error("senderId is undefined, cannot establish connection");
+      window.location.href = '/login'
+      return; 
+    }
 
-    const roomId = `${userId}-${mentorId}`;
-    socket.current.emit("joinRoom", roomId);
+    // Create WebSocket connection directly within useEffect (this runs only once when component mounts)
+    const socketConnection = new WebSocket("ws://localhost:5001"); // Replace with your server's WebSocket endpoint
 
-    // Fetch chat history
-    socket.current.on("chatHistory", (chatHistory) => {
-      setMessages(chatHistory);
-      setIsLoading(false); // Stop the loader once history is loaded
-    });
+    socketConnection.onopen = () => {
+      console.log("Connected to WebSocket server");
 
-    // Listen for incoming messages
-    socket.current.on("receiveMessage", (message) => {
-      setMessages((prev) => [...prev, message]);
-    });
-
-    // Cleanup on component unmount
-    return () => {
-      socket.current.disconnect();
+      // Join the room using roomId from URL
+      const joinMessage = { type: "joinRoom", roomId };
+      socketConnection.send(JSON.stringify(joinMessage)); // Send a message to the server
     };
-  }, [userId, mentorId]);
+
+    socketConnection.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      if (message.type === "chatHistory") {
+        setMessages(message.messages);
+        setIsLoading(false);
+      } else if (message.type === "receiveMessage") {
+        setMessages((prev) => [...prev, message]);
+      }
+    };
+
+    socketConnection.onclose = () => {
+      console.log("Disconnected from WebSocket server");
+    };
+
+    socketConnection.onerror = (error) => {
+      console.error("WebSocket Error:", error);
+    };
+
+    // Save the socket connection in state
+    setSocket(socketConnection);
+
+    // Cleanup: Close WebSocket connection on component unmount
+    return () => {
+      if (socketConnection) {
+        socketConnection.close();
+        console.log("WebSocket connection closed");
+      }
+    };
+  }, [roomId]); // Only re-run the effect if roomId changes
 
   const sendMessage = () => {
     if (inputMessage.trim() === "") return;
 
+    if (!roomId) {
+      console.error("roomId is undefined, cannot send message");
+      return;
+    }
+
     const message = {
-      senderId: userId,
+      type: "sendMessage",
+      roomId,
+      senderId,  // Use the dynamic senderId from localStorage
       text: inputMessage,
-      timestamp: new Date(),
     };
 
-    socket.current.emit("sendMessage", {
-      roomId: `${userId}-${mentorId}`,
-      message,
-    });
+    // Emit the message to the backend (send via WebSocket)
+    if (socket) {
+      socket.send(JSON.stringify(message));
 
-    // Optimistically update the chat UI
-    setMessages((prev) => [...prev, message]);
-    setInputMessage("");
+      // Optimistically update the chat UI
+      setMessages((prev) => [
+        ...prev,
+        { senderId: senderId, text: inputMessage, timestamp: new Date().toISOString() },
+      ]);
+      setInputMessage("");
+    }
   };
 
   useEffect(() => {
@@ -74,15 +116,11 @@ const Chat = ({ userId, mentorId }) => {
             {messages.map((msg, index) => (
               <div
                 key={index}
-                className={`flex ${
-                  msg.senderId === userId ? "justify-end" : "justify-start"
-                }`}
+                className={`flex ${msg.senderId === senderId ? "justify-end" : "justify-start"}`}
               >
                 <div
                   className={`max-w-xs px-4 py-3 rounded-xl shadow-md ${
-                    msg.senderId === userId
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-200 text-gray-800"
+                    msg.senderId === senderId ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-800"
                   }`}
                 >
                   <p className="text-sm">{msg.text}</p>
