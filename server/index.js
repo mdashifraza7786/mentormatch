@@ -294,9 +294,19 @@ app.delete('/user/:id', async (req, resp) => {
 app.put('/update/:id', async (req, resp) => {
     try {
         const { id } = req.params;
-        const updatedUser =
-         await Mentor.findByIdAndUpdate(id, req.body, { new: true }) ||
-         await Mentee.findByIdAndUpdate(id, req.body, { new: true });
+        const updateData = { ...req.body };
+
+        // Handle skills and experience arrays
+        if (updateData.skills) {
+            updateData.skills = updateData.skills.filter(skill => skill !== "");
+        }
+        if (updateData.experience) {
+            updateData.experience = updateData.experience.filter(exp => exp !== "");
+        }
+
+        const updatedUser = await Mentor.findByIdAndUpdate(id, updateData, { new: true }) ||
+                            await Mentee.findByIdAndUpdate(id, updateData, { new: true });
+
         if (!updatedUser) {
             return resp.status(404).send({ error: "User not found" });
         }

@@ -22,7 +22,7 @@ const About = () => {
                     <div className="text-xl sm:text-2xl font-semibold font-raleway">MentorMatch</div>
                     <div
                         className="text-lg sm:text-xl font-light cursor-pointer hover:text-red-400"
-                        onClick={() => navigate(auth ? '/' : '/home')}
+                        onClick={() => navigate('/')}
                     >
                         Home
                     </div>

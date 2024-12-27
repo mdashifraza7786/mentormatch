@@ -185,20 +185,14 @@ const ProfileSetUp = () => {
       const currentUserId = JSON.parse(localStorage.getItem("user"))._id;
       const endpoint = `https://mentormatch-ewws.onrender.com/update/${currentUserId}`;
       const isNewPhoto = profileImage && !profileImage.startsWith("https");
-      const formDataToSend = new FormData();
+      
+      // Prepare the data to be sent
+      const dataToSend = {
+        ...formData,
+        skills: formData.skills.filter(skill => skill !== ""),
+        experience: formData.experience.filter(exp => exp !== "")
+      };
 
-      // Include form data
-      Object.keys(formData).forEach((key) => {
-        if (Array.isArray(formData[key])) {
-          formData[key].forEach((value, index) =>
-            formDataToSend.append(`${key}[${index}]`, value || "")
-          );
-        } else {
-          formDataToSend.append(key, formData[key]);
-        }
-      });
-
-      // Include photo
       if (isNewPhoto) {
         const file = document.getElementById("profileImageInput").files[0];
         const photoForm = new FormData();
@@ -213,14 +207,17 @@ const ProfileSetUp = () => {
         );
 
         const photoResult = await photoResponse.json();
-        formDataToSend.append("photo", photoResult.photo_url);
+        dataToSend.photo = photoResult.photo_url;
       } else {
-        formDataToSend.append("photo", profileImage);
+        dataToSend.photo = profileImage;
       }
 
       const response = await fetch(endpoint, {
         method: "PUT",
-        body: formDataToSend,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataToSend),
       });
 
       if (response.ok) {
