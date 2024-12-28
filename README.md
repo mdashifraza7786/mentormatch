@@ -17,3 +17,6 @@ TECHNOLOGIES USED:
 2. Backend-> Node.js,Express.js, cloudinary, Websocket, jsonwebtoken, bcrypt.js
 3. Database-> MongoDB ATLAS(cloud database),Cloudinary
 4. Deployment -> Vercel(frontend), Render(backend)
+
+Additional Feature:
+1. Real time messaging feature between mentor and mentee using websocket.
