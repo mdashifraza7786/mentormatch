@@ -13,7 +13,13 @@ export default {
         supporting2: "#9FCC2E", //green
         supporting3: "#FA9F1B",  //golden yellow
         bgred: "#FF0000"       // red
-      }
+      },
+      screens: {
+        'max-1270': { max: '1270px' },
+        'max-1130': { max: '1130px' },
+        'max-1200': { max: '1200px' },
+        'max-530': { max: '530px' },
+      },
     },
   },
   plugins: [],

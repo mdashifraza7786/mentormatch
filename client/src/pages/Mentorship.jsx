@@ -70,13 +70,14 @@ const Mentorship = () => {
                         <h1 className="text-4xl font-bold text-center mb-12 text-white">
                             {role === 'mentor' ? 'Interact with your Mentees' : 'Interact with your Mentors'}
                         </h1>
-                        <div className="px-[4vh] sm:px-[4vh] py-[5vh] sm:py-4 grid grid-cols-1 gap-8 lg:grid-cols-2">
+                        <div className="px-[12vw] sm:px-[4vw] py-[5vh] sm:py-4 grid grid-cols-1 gap-8 lg:grid-cols-2">
                             {connections.map((connection) => (
                                 <div
                                     key={connection._id}
                                     className="bg-gray-800 rounded-xl shadow-lg overflow-hidden transform transition duration-300 hover:scale-105"
                                 >
-                                    <div className="flex flex-col items-center justify-center md:flex-row">
+                                    <div className="flex items-center justify-center max-[560px]:flex-col">
+
                                         {/* Image Section */}
                                         <div className="relative h-48 md:h-auto md:w-1/3 flex-shrink-0 overflow-hidden p-4">
                                             <img
@@ -92,12 +93,12 @@ const Mentorship = () => {
                                         {/* Content Section */}
                                         <div className="flex-grow p-6 sm:p-4">
                                             {/* Name Section */}
-                                            <h2 className="text-2xl font-bold text-white mb-4 sm:text-lg">
+                                            <h2 className="text-lg font-bold text-white mb-4 sm:text-lg">
                                                 {connection.name}
                                             </h2>
 
                                             {/* Bio */}
-                                            <p className="text-gray-300 text-sm mb-4 line-clamp-3 sm:text-xs">
+                                            <p className="text-gray-300 text-xs mb-4 line-clamp-3 sm:text-xs">
                                                 {connection.bio || 'No bio available'}
                                             </p>
 

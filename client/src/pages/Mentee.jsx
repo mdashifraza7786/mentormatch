@@ -158,14 +158,14 @@ const Mentee = () => {
             <div className="w-48 h-48 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
           </div>
         ) : (
-          <section className="grid grid-cols-1 md:grid-cols-2 gap-8 px-8">
+          <section className="grid max-[1160px]:grid-cols-1 grid-cols-2 gap-8 max-[1225px]:px-4 px-8">
             {mentees.length > 0 ? (
               mentees.map((mentee) => (
                 <div
                   key={mentee._id}
-                  className="bg-gray-700 text-white p-4 rounded-lg shadow-md hover:shadow-lg transition flex flex-col"
+                  className="bg-gray-700 text-white p-4 rounded-lg shadow-md hover:shadow-lg transition flex flex-col max-[520px]:items-center"
                 >
-                  <div className="flex flex-col md:flex-row items-start md:items-center gap-6 m-4">
+                  <div className="flex max-[520px]:flex-col flex-row items-start gap-6 m-4">
                     <img
                       src={mentee.photo || "https://via.placeholder.com/150"}
                       alt={mentee.name}
@@ -173,7 +173,7 @@ const Mentee = () => {
                     />
                     <div className="flex flex-col gap-4">
                       <h2 className="text-2xl font-bold text-[#3674c9]">{mentee.name}</h2>
-                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+                      <div className="flex max-[1290px]:flex-col min-[1290px]:justify-between min-[1290px]:items-center gap-4">
                         <p className="text-sm text-white flex items-center gap-2">
                           <FaEnvelope className="text-white" /> {mentee.email}
                         </p>
@@ -200,7 +200,7 @@ const Mentee = () => {
                   </div>
 
                   {role === "mentor" &&
-                    (<button onClick={() => handleChatClick(mentee._id)} className="mt-auto bg-yellow-500 text-white font-bold shadow-lg py-2 px-4 rounded-lg w-full hover:bg-yellow-600 transition">
+                    (<button onClick={() => handleChatClick(mentee._id)} className="mt-auto bg-yellow-500 text-white font-bold shadow-lg py-2 px-4 rounded-lg w-full hover:bg-yellow-600 transition duration-300 ease-in-out transform hover:-translate-y-1">
                       Chat Now
                     </button>)
                   }
