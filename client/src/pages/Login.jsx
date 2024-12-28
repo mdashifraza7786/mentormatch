@@ -11,6 +11,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  // Handle form submission for login
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -60,6 +61,7 @@ const Login = () => {
           <p className="text-gray-600 mt-2">Connect, Learn, and Grow</p>
         </div>
 
+        {/* login form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="emailOrMobile" className="block text-gray-700 font-medium mb-1">

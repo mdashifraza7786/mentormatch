@@ -20,10 +20,8 @@ const Navbar = () => {
     setIsLoggedIn(!!token);
   }, []);
 
+  // function to handle logout
   const handleLogout = () => {
-    localStorage.removeItem("auth");
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
     localStorage.clear();
     document.cookie = "auth=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     setIsLoggedIn(false);
@@ -31,10 +29,12 @@ const Navbar = () => {
     window.location.href = "/";
   };
 
+  // function to handle notifications
   const toggleNotifications = () => {
     setIsOpen(!isOpen);
   };
 
+  // function to toggle mobile menu
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
@@ -42,6 +42,7 @@ const Navbar = () => {
   return (
     <nav className="bg-gray-800 shadow-md py-4 px-4 sm:px-6 md:px-12 font-raleway relative">
       <div className="flex justify-between items-center">
+
         {/* Logo */}
         <div className="text-2xl font-bold text-purple-600">
           <Link to="/">MentorMatch®</Link>
@@ -104,7 +105,9 @@ const Navbar = () => {
                 className="text-2xl text-red-600 hover:text-red-800 cursor-pointer"
               />
             </>
-          ) : (
+          ) 
+          :
+           (
             <div className="flex gap-4">
               <Link
                 to="/login"
@@ -122,7 +125,7 @@ const Navbar = () => {
           )}
         </div>
 
-        {/* Mobile Menu Button */}
+        {/* Mobile Menu Button (3 bars) */}
         <button
           className="md:hidden text-white focus:outline-none"
           onClick={toggleMobileMenu}

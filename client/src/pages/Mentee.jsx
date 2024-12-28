@@ -10,6 +10,7 @@ const Mentee = () => {
 
   const role = JSON.parse(localStorage.getItem("user"))?.role;
 
+  // Fetch mentees from the API
   const fetchMentees = async (query = "") => {
     setLoader(true);
     try {
@@ -37,6 +38,7 @@ const Mentee = () => {
     }
   };
 
+  // handles search for mentees
   const handleSearch = (event) => {
     const value = event.target.value;
     setSearchTerm(value);
@@ -46,6 +48,7 @@ const Mentee = () => {
     fetchMentees(query);
   };
 
+  // returns the filtered mentees based on the selected skills
   const handleSkillFilter = (skill) => {
     let updatedSkills;
     if (skill === "My Interests") {
@@ -69,6 +72,7 @@ const Mentee = () => {
     }
   };
 
+  // filters the mentees based on the user's interests
   const filterByInterests = () => {
     const myskill = JSON.parse(localStorage.getItem("user")) || [];
     const myskills = myskill.skills || [];
@@ -98,14 +102,15 @@ const Mentee = () => {
     }
   };
 
+  // redirects to the chat page with the mentee ID
   const handleChatClick = (menteeId) => {
     // Redirect to chat page with mentee ID
     window.location.href = `/chat/${menteeId}`;
   };
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user")); // Parse the JSON string
-    const userId = user?._id; // Access the _id
+    const user = JSON.parse(localStorage.getItem("user")); 
+    const userId = user?._id;
     console.log("User ID:", userId);
 
     // Initial fetch to load all mentees
@@ -181,6 +186,7 @@ const Mentee = () => {
                           <FaPhone className="text-white" /> {mentee.mobile ? `+91-${mentee.mobile}` : ""}
                         </p>
                       </div>
+                      
                       {/* bio */}
                       <p className="text-[12px] text-white">
                         <span className="font-semibold"><span className="font-bold text-blue-600"></span></span> {mentee.bio}

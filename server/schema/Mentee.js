@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 
+// define the schema for our mentee model
 const MenteeSchema = new mongoose.Schema({
   role: {
     type: String,

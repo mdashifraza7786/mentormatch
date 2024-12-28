@@ -23,8 +23,10 @@ const Register = () => {
 
   const navigate = useNavigate();
 
+  // gives the user the option to select mentor or mentee
   const handleRoleChange = (e) => setRole(e.target.value);
 
+  // allows the user to upload a photo
   const handlePhotoChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -33,6 +35,7 @@ const Register = () => {
     }
   };
 
+  // allows the user to enter skills and experience
   const handleSkillsChange = (index, value) => {
     const newSkills = [...skills];
     newSkills[index] = value;
@@ -40,12 +43,14 @@ const Register = () => {
     // console.warn(skills)
   };
 
+  // allows the user to enter experience
   const handleExperienceChange = (index, value) => {
     const newExperience = [...experience];
     newExperience[index] = value;
     setExperience(newExperience);
   };
 
+  // allows the user to submit the form
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true); // Start the loader
@@ -178,6 +183,7 @@ const Register = () => {
         {/* Conditional Forms */}
         {(role === 'mentor' || role === 'mentee') && (
           <form onSubmit={handleSubmit} className="space-y-4">
+            
             {/* Photo Upload */}
             <div className="text-center mb-4">
               <label className="relative cursor-pointer inline-block">

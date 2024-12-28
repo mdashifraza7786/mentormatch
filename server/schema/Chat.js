@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 
+// Define the Chat schema for real time chat
 const ChatSchema = new mongoose.Schema({
   roomId: {
     type: String,

@@ -10,6 +10,7 @@ const Mentorship = () => {
     const user = JSON.parse(localStorage.getItem('user'));
     const { role, _id: id, mentees, mentors } = user || {};
 
+    // fetches mentors for mentees and vice versa
     const fetchConnections = useCallback(async () => {
         setLoading(true);
         setError(null);
@@ -48,6 +49,7 @@ const Mentorship = () => {
         if (user) fetchConnections();
     }, []);
 
+    // redirects to chat page with the connection ID
     const handleChatClick = (connectionId) => {
         window.location.href = `/chat/${connectionId}`;
     };

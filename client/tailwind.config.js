@@ -6,14 +6,18 @@ export default {
   ],
   theme: {
     extend: {
+
+      // defining custom colors for the project
       colors: {
-        primary: "#25476A",  //dark blue -- primary color
+        primary: "#25476A",  //dark blue
         secondary: "#03A9F4",  //light blue
         supporting1: "#AB47BC",  //dark pink
         supporting2: "#9FCC2E", //green
         supporting3: "#FA9F1B",  //golden yellow
         bgred: "#FF0000"       // red
       },
+
+      // defining media queries for responsive UI design
       screens: {
         'max-1270': { max: '1270px' },
         'max-1130': { max: '1130px' },

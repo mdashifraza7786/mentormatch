@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 
+// define the schema for our mentor model
 const MentorSchema = new mongoose.Schema({
   role: {
     type: String,

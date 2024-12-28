@@ -1,3 +1,4 @@
+// importing required modules
 import 'dotenv/config';
 import express from 'express';
 import { json } from 'express';
@@ -16,9 +17,9 @@ import { WebSocketServer } from 'ws';
 
 const app = express();
 const PORT = process.env.PORT || 5001;
-const jwtKey = process.env.JWT_KEY || 'makematch'; // Use environment variable for security
+const jwtKey = process.env.JWT_KEY || 'makematch'; // Using an environment variable for security
 
-// Cloudinary configuration
+// Cloudinary configuration for image upload
 cloudinary.config({
     cloud_name: process.env.CLOUD,
     api_key: process.env.API_KEY,
@@ -26,7 +27,7 @@ cloudinary.config({
     secure: true,
 });
 
-// Middleware
+// Middlewares for JSON, CORS, and file upload
 app.use(json());
 app.use(cors({ origin: '*', methods: ['GET', 'POST', 'PUT', 'DELETE'] }));
 app.use(fileUpload({ useTempFiles: true }));
@@ -110,6 +111,7 @@ const getUsers = async (model, query, resp) => {
     }
 };
 
+// API for photo upload
 app.post('/photo_upload', async (req,res) =>{
     const photo = req.files.photo;
     const validImageTypes = ['image/jpeg', 'image/png', 'image/gif'];
@@ -299,7 +301,7 @@ app.put('/update/:id', async (req, resp) => {
         const { id } = req.params;
         const updateData = { ...req.body };
 
-        // Handle skills and experience arrays
+        // Handling skills and experience arrays
         if (updateData.skills) {
             updateData.skills = updateData.skills.filter(skill => skill !== "");
         }

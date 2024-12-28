@@ -2,13 +2,14 @@ import React from 'react';
 import { SiHotelsdotcom } from "react-icons/si";
 import { FaInstagram, FaTwitter, FaLinkedin, FaGithub } from "react-icons/fa";
 import { AiFillApple, AiFillAndroid } from "react-icons/ai";
-import { useNavigate } from 'react-router-dom'; // Add this if using react-router-dom
+import { useNavigate } from 'react-router-dom';
 
 const Footer = () => {
-  const navigate = useNavigate(); // Use navigation hook if needed
+  const navigate = useNavigate(); // Use navigation hook
 
   return (
     <footer className="bg-gray-900 px-8 py-10 shadow-lg font-poppins">
+
       {/* Brand Section */}
       <div className="flex items-center text-2xl font-semibold mb-8">
         <span className="flex items-center gap-2 text-white">
@@ -18,6 +19,7 @@ const Footer = () => {
 
       {/* Footer Links */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-sm text-white">
+        
         {/* Info Section */}
         <div>
           <h3 className="font-bold text-gray-200 mb-4">Infoverse</h3>

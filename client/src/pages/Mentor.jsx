@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FaSearch, FaPhone, FaEnvelope, FaWallet } from "react-icons/fa";
 import Navbar from "../components/Navbar";
-// import 
+import { redirect } from "react-router-dom";
 
 const Mentor = () => {
   const [mentors, setMentors] = useState([]);
@@ -11,6 +11,7 @@ const Mentor = () => {
 
   const role = JSON.parse(localStorage.getItem("user"))?.role;
 
+  // Fetch mentors from the API
   const fetchMentors = async (query = "") => {
     setLoader(true);
     try {
@@ -30,6 +31,7 @@ const Mentor = () => {
     }
   };
 
+  // Handle search input
   const handleSearch = (event) => {
     const value = event.target.value;
     setSearchTerm(value);
@@ -37,6 +39,7 @@ const Mentor = () => {
     fetchMentors(query);
   };
 
+  // Handle skill filter
   const handleSkillFilter = (skill) => {
     let updatedSkills;
     if (skill === "My Interests") {
@@ -60,6 +63,7 @@ const Mentor = () => {
     }
   };
 
+  // filter mentors by interests
   const filterByInterests = () => {
     const myskill = JSON.parse(localStorage.getItem("user")) || [];
     const myskills = myskill.skills || [];
@@ -89,6 +93,7 @@ const Mentor = () => {
     }
   };
 
+  // redirect to chat page with mentor id
   const handleChatClick = (mentorId) => {
     window.location.href = `/chat/${mentorId}`;
   };
@@ -118,6 +123,7 @@ const Mentor = () => {
           </div>
         </div>
 
+{/* filters */}
         <div className="flex flex-wrap justify-center gap-4 mb-8">
           {["My Interests", "Cricket", "Football", "AI/ML", "Coding", "Data Analyst", "Web Development"].map(
             (skill) => (
@@ -148,6 +154,7 @@ const Mentor = () => {
                 className="bg-gray-700 text-white max-[1300px]:p-2 p-4 rounded-lg shadow-md hover:shadow-lg transition flex flex-col"
               >
                 <div className="flex flex-col md:flex-row md:items-start items-center gap-6 m-4">
+                  
                   {/* Photo and Name */}
                   <div className="flex flex-col items-center gap-4">
                     <img

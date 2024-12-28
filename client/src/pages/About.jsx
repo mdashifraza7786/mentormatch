@@ -13,6 +13,7 @@ const About = () => {
 
     return (
         <div className="pb-40 font-poppins bg-gray-800">
+            
             {/* Intro Section */}
             <div
                 className="relative min-h-[130vh] flex flex-col justify-between gap-12 px-16 py-12 text-white bg-cover bg-center before:absolute before:inset-0 before:bg-black/50"

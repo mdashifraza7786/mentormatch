@@ -21,6 +21,7 @@ const ProfileSetUp = () => {
 
   const navigate = useNavigate();
 
+  // Handle input changes in form fields
   const handleInputChange = (e) => {
     const { name, value, dataset } = e.target;
     const index = dataset.index;
@@ -38,6 +39,7 @@ const ProfileSetUp = () => {
   const currentUserId = currentUser?._id;
   const isMentor = currentUser?.role === "mentor";
 
+// Fetch user profile data
   const fetchUserProfile = async () => {
     setLoading(true);
     try {
@@ -81,6 +83,7 @@ const ProfileSetUp = () => {
     fetchUserProfile();
   }, []);
 
+  // Handle image upload during update
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -90,6 +93,7 @@ const ProfileSetUp = () => {
     }
   };
 
+  // Handle profile deletion
   const handleDelete = async () => {
     const currentUserId = JSON.parse(localStorage.getItem("user"))?._id;
 
@@ -141,6 +145,7 @@ const ProfileSetUp = () => {
     }
   };
 
+  // Handle form submission for updating profile
   const handleSubmit = async (e) => {
     e.preventDefault();
 

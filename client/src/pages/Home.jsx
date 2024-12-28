@@ -14,6 +14,7 @@ const Home = () => {
     <div>
       <Navbar />
       <div className="font-raleway">
+        
         {/* Hero Section */}
         <section className="flex flex-col md:flex-row items-center justify-between px-8 md:px-16 py-16 bg-gray-900">
           <div className="max-w-lg text-center md:text-left">
