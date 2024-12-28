@@ -1,7 +1,7 @@
 # MentorMatch - a platform to allow mentor-mentee interaction.
 
-DEPLOYMENT URL for frontend - "https://mentor-match-sandy.vercel.app/"
-DEPLOYMENT URL for backend - "https://mentormatch-ewws.onrender.com/"
+1. DEPLOYMENT URL for frontend - "https://mentor-match-sandy.vercel.app/"
+2. DEPLOYMENT URL for backend - "https://mentormatch-ewws.onrender.com/"
 
 SET-UP Instructions:
 
