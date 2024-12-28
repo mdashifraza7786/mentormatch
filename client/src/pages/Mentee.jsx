@@ -109,7 +109,7 @@ const Mentee = () => {
   };
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user")); 
+    const user = JSON.parse(localStorage.getItem("user"));
     const userId = user?._id;
     console.log("User ID:", userId);
 
@@ -163,32 +163,32 @@ const Mentee = () => {
             <div className="w-48 h-48 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
           </div>
         ) : (
-          <section className="grid max-[1160px]:grid-cols-1 grid-cols-2 gap-8 max-[1225px]:px-4 px-8">
+          <section className="grid grid-cols-2 gap-8 max-1040:flex max-1040:flex-col max-470:px-2  max-[1225px]:px-4 px-7">
             {mentees.length > 0 ? (
               mentees.map((mentee) => (
                 <div
                   key={mentee._id}
                   className="bg-gray-700 text-white p-4 rounded-lg shadow-md hover:shadow-lg transition flex flex-col max-[520px]:items-center"
                 >
-                  <div className="flex max-[520px]:flex-col flex-row items-start gap-6 m-4">
+                  <div className="flex max-530px:flex-col flex-row items-start gap-3 sm:gap-6 m-2 sm:m-4">
                     <img
                       src={mentee.photo || "https://via.placeholder.com/150"}
                       alt={mentee.name}
-                      className="w-52 h-52 rounded-md object-cover shadow-md"
+                      className="w-32 h-32 sm:w-52 sm:h-52 rounded-md object-cover shadow-md"
                     />
                     <div className="flex flex-col gap-4">
                       <h2 className="text-2xl font-bold text-[#3674c9]">{mentee.name}</h2>
-                      <div className="flex max-[1290px]:flex-col min-[1290px]:justify-between min-[1290px]:items-center gap-4">
-                        <p className="text-sm text-white flex items-center gap-2">
+                      <div className="flex justify-between items-center max-1270:flex-col max-1270:items-start max-1270:gap-4">
+                        <p className="max-470:text-[11px] text-sm text-white flex items-center gap-2">
                           <FaEnvelope className="text-white" /> {mentee.email}
                         </p>
-                        <p className="text-sm text-white flex items-center gap-2">
+                        <p className="max-470:text-[11px] text-sm text-white flex items-center gap-2">
                           <FaPhone className="text-white" /> {mentee.mobile ? `+91-${mentee.mobile}` : ""}
                         </p>
                       </div>
-                      
+
                       {/* bio */}
-                      <p className="text-[12px] text-white">
+                      <p className="text-[12px] max-1270:hidden text-white">
                         <span className="font-semibold"><span className="font-bold text-blue-600"></span></span> {mentee.bio}
                       </p>
 
@@ -218,6 +218,9 @@ const Mentee = () => {
               </p>
             )}
           </section>
+
+
+
         )}
       </div>
     </div>

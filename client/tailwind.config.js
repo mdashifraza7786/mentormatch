@@ -21,8 +21,10 @@ export default {
       screens: {
         'max-1270': { max: '1270px' },
         'max-1130': { max: '1130px' },
+        'max-1040': { max: '1040px' },
         'max-1200': { max: '1200px' },
         'max-530': { max: '530px' },
+        'max-470': { max: '470px' },
       },
     },
   },
