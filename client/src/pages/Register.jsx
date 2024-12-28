@@ -315,7 +315,7 @@ const Register = () => {
                   <label className="block text-gray-700 font-semibold mb-2">Expected Charges (per hour in INR)</label>
                   <input
                     type="number"
-                    placeholder="E.g., 50 USD"
+                    placeholder="E.g., 50 INR"
                     value={charges}
                     onChange={(e) => setCharges(e.target.value)}
                     className="w-full p-3 border rounded-md focus:outline-none focus:ring focus:ring-blue-300"
