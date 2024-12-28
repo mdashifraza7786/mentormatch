@@ -204,7 +204,7 @@ const Mentor = () => {
                 </div>
         
                 {/* Chat Button */}
-                {role !== "mentee" && (
+                {role === "mentee" && (
                   <button
                     onClick={() => handleChatClick(mentor._id)}
                     className="mt-auto bg-yellow-500 text-white font-bold shadow-lg py-2 px-4 rounded-lg w-full hover:bg-yellow-600 transition duration-300 ease-in-out transform hover:-translate-y-1"
