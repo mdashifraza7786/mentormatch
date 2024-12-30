@@ -9,18 +9,49 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [notifications, setNotifications] = useState([
-    "You have a new message from John.",
-    "Your profile was viewed by Sarah.",
-    "Reminder: Meeting at 3 PM tomorrow."
-  ]);
+  const [notifications, setNotifications] = useState([]);
+  const [userData, setUserData] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("user") || document.cookie.includes("auth");
     setIsLoggedIn(!!token);
+    if (token) {
+      fetchUserData();
+      const intervalId = setInterval(fetchUserData, 10000); // 10000 ms = 10 seconds
+
+      // Cleanup the interval on component unmount
+      return () => clearInterval(intervalId);
+    }
   }, []);
 
-  // function to handle logout
+  const fetchUserData = async () => {
+    try {
+      const storedUser = JSON.parse(localStorage.getItem("user"));
+      const email = storedUser.email;
+
+      const response = await fetch("http://localhost:5001/syncdata", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Update localStorage with the new user data (if needed)
+        localStorage.setItem("user", JSON.stringify(data.user));
+        setUserData(data.user);
+        setNotifications(data.user.notifications); // Set notifications from user data
+      } else {
+        console.error("Error fetching user data:", data.error);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
   const handleLogout = () => {
     localStorage.clear();
     document.cookie = "auth=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
@@ -29,44 +60,98 @@ const Navbar = () => {
     window.location.href = "/";
   };
 
-  // function to handle notifications
   const toggleNotifications = () => {
     setIsOpen(!isOpen);
   };
 
-  // function to toggle mobile menu
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const handleAccept = async (notificationId) => {
+    try {
+      const storedUser = JSON.parse(localStorage.getItem("user"));
+      const userId = storedUser._id;
+      const isMentor = storedUser.role === "mentor"; // Assuming role exists
+
+      const response = await fetch('http://localhost:5001/acceptMentorshipRequest', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId,
+          notificationId,
+          isMentor,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setNotifications((prevNotifications) =>
+          prevNotifications.filter((notification) => notification.id !== notificationId)
+        );
+        console.log(data.message); // Log success message
+      } else {
+        console.error('Error accepting mentorship request:', data.error);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const handleDecline = async (notificationId) => {
+    try {
+      const storedUser = JSON.parse(localStorage.getItem("user"));
+      const userId = storedUser._id;
+      const isMentor = storedUser.role === "mentor"; // Assuming role exists
+
+      const response = await fetch('http://localhost:5001/declineMentorshipRequest', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId,
+          notificationId,
+          isMentor,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setNotifications((prevNotifications) =>
+          prevNotifications.filter((notification) => notification.id !== notificationId)
+        );
+        console.log(data.message); // Log success message
+      } else {
+        console.error('Error declining mentorship request:', data.error);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
 
   return (
     <nav className="bg-gray-800 shadow-md py-4 px-4 sm:px-6 md:px-12 font-raleway relative">
       <div className="flex justify-between items-center">
-
-        {/* Logo */}
         <div className="text-2xl font-bold text-purple-600">
           <Link to="/">MentorMatch®</Link>
         </div>
 
-        {/* Desktop Navigation Links */}
         <div className="hidden md:flex gap-10">
-          <Link to="/about" className="text-white hover:text-blue-600">
-            About
-          </Link>
-          <Link to="/mentors" className="text-white hover:text-blue-600">
-            Mentors
-          </Link>
-          <Link to="/mentees" className="text-white hover:text-blue-600">
-            Mentees
-          </Link>
+          <Link to="/about" className="text-white hover:text-blue-600">About</Link>
+          {userData && userData.role === "mentor" && (
+            <Link to="/mentees" className="text-white hover:text-blue-600">Mentees</Link>
+          )}
+          {userData && userData.role === "mentee" && (
+          <Link to="/mentors" className="text-white hover:text-blue-600">Mentors</Link>
+        )}
           {isLoggedIn && (
-            <Link to="/mentorship" className="text-white hover:text-blue-600">
-              Mentorship
-            </Link>
+            <Link to="/mentorship" className="text-white hover:text-blue-600">Mentorship</Link>
           )}
         </div>
 
-        {/* User Options for Desktop */}
         <div className="hidden md:flex items-center gap-4 relative">
           {isLoggedIn ? (
             <>
@@ -81,12 +166,9 @@ const Navbar = () => {
                       <h3 className="font-bold text-lg">Notifications</h3>
                       <ul className="mt-2">
                         {notifications.length > 0 ? (
-                          notifications.map((notification, index) => (
-                            <li
-                              key={index}
-                              className="py-2 cursor-pointer hover:bg-gray-100 text-sm border-b last:border-none"
-                            >
-                              {notification}
+                          notifications.map((notification) => (
+                            <li key={notification.id} className="py-2 cursor-pointer hover:bg-gray-100 text-sm border-b last:border-none">
+                              <div>{notification.message}</div>
                             </li>
                           ))
                         ) : (
@@ -105,9 +187,7 @@ const Navbar = () => {
                 className="text-2xl text-red-600 hover:text-red-800 cursor-pointer"
               />
             </>
-          ) 
-          :
-           (
+          ) : (
             <div className="flex gap-4">
               <Link
                 to="/login"
@@ -125,7 +205,6 @@ const Navbar = () => {
           )}
         </div>
 
-        {/* Mobile Menu Button (3 bars) */}
         <button
           className="md:hidden text-white focus:outline-none"
           onClick={toggleMobileMenu}
@@ -138,7 +217,6 @@ const Navbar = () => {
         </button>
       </div>
 
-      {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="md:hidden mt-4">
           <Link to="/about" className="block py-2 text-white hover:text-blue-600">
@@ -174,12 +252,9 @@ const Navbar = () => {
                     <h3 className="font-bold text-lg text-white mb-2">Notifications</h3>
                     <ul>
                       {notifications.length > 0 ? (
-                        notifications.map((notification, index) => (
-                          <li
-                            key={index}
-                            className="py-2 text-sm text-white border-b border-gray-600 last:border-none"
-                          >
-                            {notification}
+                        notifications.map((notification) => (
+                          <li key={notification.id} className="py-2 text-sm text-white border-b border-gray-600 last:border-none">
+                            <div>{notification.message}</div>
                           </li>
                         ))
                       ) : (
@@ -217,4 +292,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-

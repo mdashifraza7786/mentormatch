@@ -56,7 +56,7 @@ const MentorSchema = new mongoose.Schema({
     require: true,
     type: String,
   },
-  mentors: {
+  mentees: {
     type: [String],
     default: [],
   },
@@ -84,12 +84,17 @@ const MentorSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
       },
+      mentorshipRequestId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'MentorshipRequest',
+      },
       createdAt: {
         type: Date,
         default: Date.now,
       },
     },
   ],
+  
   createdAt: {
     type: Date,
     default: Date.now,

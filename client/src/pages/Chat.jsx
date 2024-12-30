@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom"; // Import useParams to get dynamic route params
 
 const Chat = () => {
-  const { roomId } = useParams(); // Use the dynamic roomId from the URL
+  const { roomId } = useParams();
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -31,7 +31,7 @@ const Chat = () => {
       console.log("Connected to WebSocket server");
 
       // Join the room using roomId from URL
-      const joinMessage = { type: "joinRoom", roomId };
+      const joinMessage = { type: "joinRoom", roomId,senderId:senderId };
       socketConnection.send(JSON.stringify(joinMessage)); // Send a message to the server
     };
 
